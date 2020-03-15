@@ -1,0 +1,2646 @@
+<!DOCTYPE html>
+<!-- saved from url=(0146)https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/posts/instrumenting-with-segger-systemview?CommentId=65e44d50-75c4-4359-87bc-2313f8368a2d -->
+<html lang="en" class="direction-ltr" style="direction: ltr;" prefix="og: http://ogp.me/ns#"><head prefix="article:http://ogp.me/ns/article#"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone</title>
+<meta name="GENERATOR" content="Telligent Community 10"><meta name="keywords" content="segger systemview nrf52 s132"><meta name="description" content="Segger has recently released a number of tools, some of them free, which work with Segger&#39;s JLink debuggers, One of those is SystemView, a real-time analysis and visualisation tool. It&#39;s cross platform and &lt;a href=&quot;https://www.segger.com/systemview.html?p=1731&quot;&gt;Segger&#39;s page for it is here&lt;/a&gt;.
+SystemView us..."><meta property="og:type" content="article"><meta property="og:url" content="https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/posts/instrumenting-with-segger-systemview"><meta property="og:description" content="Segger has recently released a number of tools, some of them free, which work with Segger&#39;s JLink debuggers, One of those is SystemView, a real-time analysis and visualisation tool. It&#39;s cross platform and &lt;a href=&quot;https://www.segger.com/systemview.html?p=1731&quot;&gt;Segger&#39;s page for it is here&lt;/a&gt;.
+SystemView us..."><meta property="og:title" content="Instrumenting with Segger SystemView"><meta property="og:site_name" content="Nordic DevZone"><link rel="pingback" href="https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/pingback"><link rel="alternate" type="application/rss+xml" title="Nordic Blog (RSS 2.0)" href="https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/rss"><link rel="alternate" type="application/atom+xml" title="Nordic Blog  (Atom 1.0)" href="https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/atom"><link rel="alternate" type="application/rss+xml" title="Nordic Blog - All Comments (RSS 2.0)" href="https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/rsscomments"><link rel="alternate" type="application/rss+xml" title="Nordic Blog - Comments for this post (RSS 2.0)" href="https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/rsscomments?WeblogPostID=931"><link rel="EditURI" type="application/rsd+xml" title="RSD" href="https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/rsd"><link rel="wlwmanifest" type="application/wlwmanifest+xml" title="WLWManifest" href="https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/wlwmanifest"><script src="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/leadflows.js.Без названия" type="text/javascript" id="LeadFlows-1961165" crossorigin="anonymous" data-leadin-portal-id="1961165" data-leadin-env="prod" data-loader="hs-scriptloader" data-hsjs-portal="1961165" data-hsjs-env="prod"></script><script src="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/fb.js.Без названия" type="text/javascript" id="hs-ads-pixel-1961165" data-ads-portal-id="1961165" data-ads-env="prod" data-loader="hs-scriptloader" data-hsjs-portal="1961165" data-hsjs-env="prod"></script><script src="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/1961165.js.Без названия" type="text/javascript" id="hs-script-loader"></script><script src="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/516903161852586" async=""></script><script async="" src="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/fbevents.js.Без названия"></script><script type="text/javascript" async="" src="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/1474.js.Без названия"></script><script type="text/javascript" async="" src="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/analytics.js.Без названия"></script><script id="hs-analytics" src="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/1961165.js(1).Без названия"></script><script type="text/javascript" async="" src="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/analytics.js.Без названия"></script><script async="" src="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/gtm.js.Без названия"></script><script type="text/javascript" src="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/jquery.min.js.Без названия"></script><script type="text/javascript" src="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/telligent.glow.min.js.Без названия"></script><script type="text/javascript" src="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/jquery.validate.min.js.Без названия"></script><script type="text/javascript">
+// <![CDATA[
+try { jQuery.extend(jQuery.validator.messages,{required:'This field is required.',remote:'Please fix this field.',date:'Please enter a valid date.',dateISO:'Please enter a valid date (ISO).',number:'Please enter a valid number.',digits:'Please enter only digits.',creditcard:'Please enter a valid credit card number.',equalTo:'Please enter the same value again.',accept:'Please enter a value with a valid extension.',maxlength:jQuery.validator.format('Please enter no more than {0} characters.'),minlength:jQuery.validator.format('Please enter at least {0} characters.'),rangelength:jQuery.validator.format('Please enter a value between {0} and {1} characters long.'),range:jQuery.validator.format('Please enter a value between {0} and {1}.'),max:jQuery.validator.format('Please enter a value less than or equal to {0}.'),min:jQuery.validator.format('Please enter a value greater than or equal to {0}.')}); } catch(e) { };
+// ]]>
+</script><script type="text/javascript" src="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/telligent.evolution.min.js.Без названия"></script><script type="text/javascript">
+// <![CDATA[
+try { jQuery.telligent.evolution.site.configure({baseUrl:'\/',isRemote:false,remoteUrlEncodePattern:'',quoteText:'Quote',datePattern:{
+	pattern: '<1-31> <Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Oct,Nov,Dec> <0001-9999>',
+    yearIndex: 2,
+    monthIndex: 1,
+    dayIndex: 0,
+    hourIndex: -1,
+    minuteIndex: -1,
+    amPmIndex: -1,
+    parseDateOnLoad: true
+},dateTimePattern:{
+	pattern: '<1-31> <Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Oct,Nov,Dec> <0001-9999> <00-23>:<00-59>',
+    yearIndex: 2,
+    monthIndex: 1,
+    dayIndex: 0,
+    hourIndex: 3,
+    minuteIndex: 4,
+    amPmIndex: -1,
+    parseDateOnLoad: true
+},timePattern:{
+	pattern: '<00-23>:<00-59>',
+    yearIndex: -1,
+    monthIndex: -1,
+    dayIndex: -1,
+    hourIndex: 0,
+    minuteIndex: 1,
+    amPmIndex: -1,
+    parseDateOnLoad: true
+},monthNames:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],dayNames:['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],authorizationCookieName:'AuthorizationCookie',defaultErrorMessage:'An error occurred.  Please try again or contact your administrator.',defaultMultiErrorMessagePrefix:'The following errors occurred:  ',silverlightFileUploadEnabled:true,accessingUserId:2101,accessingUserIsSystemAccount:true,accessingUserTemporary:false,reflowBreakpoint:670,dateMinuteInFutureFormat:'in a few seconds',dateMinutesInFutureFormat:'in {0} minutes',dateHourInFutureFormat:'in over an hour',dateHoursInFutureFormat:'in {0} hours',dateDayInFutureFormat:'in {0} day',dateDaysInFutureFormat:'in {0} days',dateMonthInFutureFormat:'in {0} month',dateMonthsInFutureFormat:'in {0} months',dateYearInFutureFormat:'in over {0} year',dateYearsInFutureFormat:'in over {0} years',dateNowAgoFormat:'now',dateMinuteAgoFormat:'a few seconds ago',dateMinutesAgoFormat:'{0} minutes ago',dateHourAgoFormat:'{0} hour ago',dateHoursAgoFormat:'{0} hours ago',dateDayAgoFormat:'{0} day ago',dateDaysAgoFormat:'{0} days ago',dateMonthAgoFormat:'{0} month ago',dateMonthsAgoFormat:'{0} months ago',dateYearAgoFormat:'over {0} year ago',dateYearsAgoFormat:'over {0} years ago',previewZoomIn:'Zoom in',previewZoomOut:'Zoom out',previewClose:'Close'});
+jQuery.extend($.fn.evolutionUserFileTextBox.defaults,{removeText:'Remove',selectText:'Select\/Upload...',noFileText:'No File Selected'});
+jQuery.telligent.evolution.navigationConfirmation.configure({message:'Unless you save before leaving this page, you will lose any changes you have made.'});
+jQuery.telligent.evolution.systemNotifications.configure({explicitPanelUrl:'#_cptype=panel&_cpcontexttype=Explicit&_cppanelid=994a7020-02f3-4fc2-ba7d-be3f0febf9f9&viewnotification=1',notificationText:'System Notification',reviewText:'Click to review and resolve.',andMoreText:' (plus {0} more)'});
+jQuery.telligent.evolution.validation.registerExtensions({passwordInvalidMessage:'Password contains invalid chars ...',passwordRegex:'^.{12,}$',emailInvalidMessage:'Your email address is invalid.',emailRegex:'^[!$&*\\-=^`|~#%\'\\.\"+\/?_{}\\\\a-zA-Z0-9 ]+@[\\-\\.a-zA-Z0-9]+(?:\\.[a-zA-Z0-9]+)+$',usernameInvalidMessage:'Your sign in name does not meet the requirements for this site.',usernameRegex:'^[a-zA-Z0-9_\\- @\\.\\\\\\&\\(\\)\\[\\]\\!\\+\\`\\*\\\"\\?\\|]+$',emailsInvalidMessage:'One or more emails is invalid',urlInvalidMessage:'URL not in correct format',urlRegex:'^(?:(?:http|https|mailto|ftp|mms):|\/|#|~\/|data:image\/(?:png|gif|jpe?g);base64,)'});
+jQuery.extend(jQuery.fn.evolutionLike.defaults,{likeText:'Like',unlikeText:'Unlike',modalTitleText:'People who like this',modalShowMoreText:'Show More',whoLikesOtherText:'<a href=\"{user_profile_url}\" class=\"internal-link view-user-profile\">{user_display_name}<\/a> likes this',whoLikesOtherTwoText:'<a href=\"{user_profile_url}\" class=\"internal-link view-user-profile\">{user_display_name}<\/a> and <span class=\"who-likes\">1 other<\/span> like this',whoLikesOtherMultipleText:'<a href=\"{user_profile_url}\" class=\"internal-link view-user-profile\">{user_display_name}<\/a> and <span class=\"who-likes\">{count} others<\/span> like this',whoLikesAccessingText:'You like this',whoLikesAccessingTwoText:'You and <span class=\"who-likes\">1 other<\/span> like this',whoLikesAccessingMultipleText:'You and <span class=\"who-likes\">{count} others<\/span> like this'});
+jQuery.extend(jQuery.fn.evolutionInlineTagEditor.defaults,{editButtonText:'Edit tags',selectTagsText:'Select tags',saveTagsText:'Save',cancelText:'Cancel'});
+jQuery.extend(jQuery.fn.evolutionStarRating.defaults,{titles:['Terrible','Poor','Fair','Average','Good','Excellent'],ratingMessageFormat:'Average rating: {rating} out of {count} ratings.'});
+jQuery.extend(jQuery.fn.evolutionModerate.defaults,{moderateLinkText:'moderate',reportLinkText:'Report as abusive',reportedLinkText:'Reported as abusive',reportedNotificationMessageText:'{NAME}\'s post has been reported. <strong>Thank you for your feedback.<\/strong>'});
+jQuery.extend(jQuery.fn.evolutionBookmark.defaults,{deleteBookmarkText:'Unbookmark {content_type_name}',addBookmarkText:'Bookmark this {content_type_name}',processingText:'...'});
+jQuery.extend($.fn.evolutionCodeEditor.defaults,{editorUrl:'\/cfs-file\/__key\/system\/ace\/ace.js'});
+jQuery.extend(jQuery.telligent.evolution.ui.components.forumvotes.defaults,{modalTitleTextThread:'People who had this question',modalTitleTextReply:'People helped by this answer',noVotesText:'No Votes',modalShowMoreText:'More'});
+jQuery.extend(jQuery.telligent.evolution.ui.components.forumqualityvotes.defaults,{modalTitleText:'People who voted on this thread',tipTextThread:'View Voters',noVotesText:'No Votes',upVoteText:'Vote Up',downVoteText:'Vote Down',logintext:'Login to vote on this thread',modalShowMoreText:'More'});
+jQuery.extend(jQuery.fn.evolutionFeature.defaults,{editFeatureText:'Edit Feature',addFeatureText:'Feature ',processingText:'...'});
+} catch(e) { };
+// ]]>
+</script><script type="text/javascript">jQuery(function($) {
+	$.telligent.evolution.messaging.subscribe('userActionFollowToggle', function(data) {
+		var e = $(data.target);
+		var userId = e.data('userid'), accessingUserId = e.data('accessinguserid'), v = e.data('follow');
+		e.html('...');
+		if (v) {
+			$.telligent.evolution.post({
+				url: $.telligent.evolution.site.getBaseUrl() + 'api.ashx/v2/users/{FollowerId}/following.json',
+				data: { FollowerId: accessingUserId, FollowingId: userId },
+				dataType: 'json',
+				success: function(response) { e.html('Unfollow').data('follow', false); },
+				error: function(response) {  e.html('Follow').data('follow', true); }
+			});
+		} else {
+			$.telligent.evolution.del({
+				url: $.telligent.evolution.site.getBaseUrl() + 'api.ashx/v2/users/{FollowerId}/following/{FollowingId}.json',
+				data: { FollowerId: accessingUserId, FollowingId: userId },
+				dataType: 'json',
+				success: function(response) { e.html('Follow').data('follow', true); },
+				error: function(response) {  e.html('Unfollow').data('follow', false); }
+			});
+		}
+	});
+});</script><script type="text/javascript">jQuery(function($) {
+	$.telligent.evolution.messaging.subscribe('userActionFriendshipToggle', function(data) {
+		var e = $(data.target);
+		var userId = e.data('userid'), accessingUserId = e.data('accessinguserid'), v = parseInt(e.data('friendship'));
+		var t = e.html();
+		e.html('...');
+		if (v == 0) {
+				e.html(t);
+				$.glowModal('/user/requestfriend?UserId=' + userId + '', {width:670,height:390});
+		} else if (v == 3) {
+				$.telligent.evolution.post({
+					url: $.telligent.evolution.site.getBaseUrl() + 'api.ashx/v2/users/{RequestorId}/friends.json',
+					data: { RequestorId: accessingUserId, RequesteeId: userId, RequestMessage: ' '},
+					dataType: 'json',
+					success: function(response) { window.location = window.location; },
+					error: function(response) {  e.html(t); }
+				});
+		} else if (v == 1 || v == 2 || v == 4) {
+			if (v == 4 || (v == 1 && window.confirm('Are you sure you want to cancel this friendship request?')) || (v == 2 && window.confirm('Are you sure you want to unfriend this person?'))) {
+				$.telligent.evolution.del({
+					url: $.telligent.evolution.site.getBaseUrl() + 'api.ashx/v2/users/{RequestorId}/friends/{RequesteeId}.json',
+					data: { RequestorId: accessingUserId, RequesteeId: userId },
+					dataType: 'json',
+					success: function(response) { window.location = window.location; },
+					error: function(response) {  e.html(t); }
+				});
+			} else { e.html(t); }
+		}
+	});
+});</script><script type="text/javascript">
+(function($){
+$.extend($.fn.evolutionUpDownVoting.defaults,{voteDownMessage:'Vote against this idea',voteUpMessage:'Vote for this idea',loginMessage:'Sign in to vote on ideas',noPermissionMessage:'You do not have permission to vote for this idea',notGroupMemberMessage:'Join this group to vote on this idea',deleteMessage:'Remove your vote for this idea',readOnlyMessage: 'Voting on this idea has been disabled',switchToDownVoteMessage: 'Vote against this idea instead of for it',switchToUpVoteMessage: 'Vote for this idea instead of against it' });}(jQuery));
+</script>
+<script type="text/javascript">(function($){ $.telligent.evolution.media.defaults.endpoint = 'https://devzone.nordicsemi.com/callback.ashx?__type=Telligent.Evolution.Api.Plugins.Endpoints.FileViewerEndpoint%2C%20Telligent.Evolution.Platform'; }(jQuery));</script><script type="text/javascript">(function($){ $.telligent.evolution.preview.defaults.endpoint = 'https://devzone.nordicsemi.com/callback.ashx?__type=Telligent.Evolution.Api.Plugins.Endpoints.WebPreviewEndpoint%2C%20Telligent.Evolution.Platform'; }(jQuery));</script><script type="text/javascript">(function($){ $.fn.evolutionComposer.plugins.mentions.defaults.mentionablesEndpoint = 'https://devzone.nordicsemi.com/callback.ashx?__type=Telligent.Evolution.Api.Plugins.Endpoints.MentionablesEndpoint%2C%20Telligent.Evolution.Platform'; }(jQuery));</script><script type="text/javascript">(function($){ $.telligent.evolution.language.defaults.dateEndpoint = 'https://devzone.nordicsemi.com/callback.ashx?__type=Telligent.Evolution.Api.Plugins.Endpoints.DateFormattingEndpoint%2C%20Telligent.Evolution.Platform'; }(jQuery));</script><script type="text/javascript">(function($){ $.fn.evolutionUserFileTextBox.defaults.endpoint = 'https://devzone.nordicsemi.com/callback.ashx?__type=Telligent.Evolution.Api.Plugins.Endpoints.UserFileTextBoxEndpoint%2C%20Telligent.Evolution.Platform'; }(jQuery));</script><script type="text/javascript">
+if (window === window.top) {
+	jQuery(document).ready(function(j){
+		var redirected = false;
+		var ensureLoggedIn = function(){
+			if (!redirected) {
+				var hashData = jQuery.telligent.evolution.url.hashData();
+				if (hashData._cptype){
+					redirected = true;
+					window.location = jQuery.telligent.evolution.url.modify({
+						url:'/login?ReturnUrl=%2Fnordic%2Fnordic-blog%2Fb%2Fblog%2Fposts%2Finstrumenting-with-segger-systemview%3FCommentId%3D65e44d50-75c4-4359-87bc-2313f8368a2d',
+						query: {
+							ReturnUrl:window.location+''
+						},
+						hash: ''
+					});
+				}
+			}
+		};
+		jQuery(window).on('hashchange', function(){
+			ensureLoggedIn();
+		});
+		ensureLoggedIn()
+	});
+}
+</script><link rel="stylesheet" href="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/platform.less" media="screen">
+          
+<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1">
+<link rel="shortcut icon" type="image/ico" href="https://devzone.nordicsemi.com/cfs-filesystemfile/__key/themefiles/s-fd-a4b603bd26214a2c832b0da0b8713054-files/favicon.ico?_=637057014840000000">
+<link rel="apple-touch-icon-precomposed" href="https://devzone.nordicsemi.com/cfs-filesystemfile/__key/themefiles/s-fd-a4b603bd26214a2c832b0da0b8713054-files/favicon152.png?_=637057014840000000">
+<meta name="msapplication-TileColor" content="#FFFFFF">
+<meta name="msapplication-TileImage" content="https://devzone.nordicsemi.com/cfs-filesystemfile/__key/themefiles/s-fd-a4b603bd26214a2c832b0da0b8713054-files/favicon144.png?_=637057014840000000">
+<meta name="og:image" content="https://devzone.nordicsemi.com/cfs-filesystemfile/__key/defaultwidgets/5c80128995a34929b72ae6ae126845e9-799025da7b894fb19da85b7a62222516/logo.png">
+
+        <link type="text/css" rel="stylesheet" href="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/screen.less"><link type="text/css" rel="stylesheet" href="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/print.css" media="print"><link type="text/css" rel="stylesheet" href="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/handheld.less" media="only screen and (max-width: 670px)"><link type="text/css" rel="stylesheet" href="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/tablet.less" media="only screen and (min-device-width: 671px) and (max-device-width: 1024px) and (orientation: landscape), only screen and (min-device-width: 671px) and (max-device-width: 1024px) and (orientation: portrait)"><script type="text/javascript" src="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/theme.js.Без названия"></script>
+          <link type="text/css" rel="stylesheet" href="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/dynamic-style" media="screen,print">
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async="" src="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/js"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'UA-69304823-1');
+</script>
+<!-- End of Global site tag (gtag.js) - Google Analytics -->
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-WR7GSKT');</script>
+<!-- End Google Tag Manager -->
+
+<link rel="stylesheet" type="text/css" id="u0" href="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/skin.min.css"></head><div id="screen-shader" style="
+            transition: opacity 0.1s ease 0s; 
+            z-index: 2147483647;
+            margin: 0; 
+            border-radius: 0; 
+            padding: 0; 
+            background: #fac563; 
+            pointer-events: none; 
+            position: fixed; 
+            top: -10%; 
+            right: -10%; 
+            width: 120%; 
+            height: 120%; 
+            opacity: 0.6000;
+            mix-blend-mode: multiply; 
+            display: none;
+        "></div>
+<body spellcheck="true"><style type="text/css">div#hs-eu-cookie-confirmation{background:#fff;height:auto;left:0;position:absolute;top:0;width:100%;z-index:100000000 !important;border-bottom:1px solid #cbd6e2;border-top:1px solid #cbd6e2;box-shadow:0 1px 5px #eaf0f6;color:#33475b;font-family:inherit;font-size:inherit;font-weight:normal !important;line-height:inherit;text-align:left;text-shadow:none !important;font-size:12px;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;line-height:18px}div#hs-eu-cookie-confirmation *{box-sizing:border-box !important}div#hs-eu-cookie-confirmation div#hs-eu-cookie-confirmation-inner{background:#fff;margin:0 auto;max-width:1000px;padding:20px}div#hs-eu-cookie-confirmation div#hs-eu-cookie-confirmation-inner a{background:none !important;border:none !important;box-shadow:none !important;color:#0091ae;font-family:inherit;font-size:inherit;font-weight:normal !important;line-height:inherit;text-align:left;text-shadow:none !important;text-decoration:none !important}div#hs-eu-cookie-confirmation div#hs-eu-cookie-confirmation-inner a:hover{background:none !important;border:none !important;box-shadow:none !important;color:#0091ae;font-family:inherit;font-size:inherit;font-weight:normal !important;line-height:inherit;text-align:left;text-shadow:none !important;text-decoration:underline !important}div#hs-eu-cookie-confirmation div#hs-eu-cookie-confirmation-inner div#hs-en-cookie-confirmation-buttons-area{margin:10px 0 0 !important;text-align:right !important}div#hs-eu-cookie-confirmation div#hs-eu-cookie-confirmation-inner input#hs-eu-active-consent-checkbox{display:inline-block !important;cursor:pointer !important;font-size:xx-large !important}div#hs-eu-cookie-confirmation div#hs-eu-cookie-confirmation-inner a#hs-eu-confirmation-button,div#hs-eu-cookie-confirmation div#hs-eu-cookie-confirmation-inner a#hs-eu-decline-button{border-radius:3px;display:inline-block;padding:10px 16px !important;text-decoration:none !important}div#hs-eu-cookie-confirmation div#hs-eu-cookie-confirmation-inner a#hs-eu-confirmation-button{background-color:#00A9CE !important;border:1px solid #00A9CE !important;margin-right:12px !important;color:#fff;font-family:inherit;font-size:inherit;font-weight:normal !important;line-height:inherit;text-align:left;text-shadow:none !important}div#hs-eu-cookie-confirmation div#hs-eu-cookie-confirmation-inner a#hs-eu-confirmation-button.isDisabled{color:currentColor !important;cursor:not-allowed important;opacity:0.5 !important;text-decoration:none !important;pointer-events:none !important}div#hs-eu-cookie-confirmation div#hs-eu-cookie-confirmation-inner a#hs-eu-decline-button{border:1px solid #00A9CE !important;color:#00A9CE;font-family:inherit;font-size:inherit;font-weight:normal !important;line-height:inherit;text-align:left;text-shadow:none !important}div#hs-eu-cookie-confirmation div#hs-eu-cookie-confirmation-inner p{margin:0 0 12px;color:#33475b;font-family:inherit;font-size:inherit;font-weight:normal !important;line-height:inherit;text-align:left;text-shadow:none !important}@media print{div#hs-eu-cookie-confirmation{display:none !important}}@media screen and (max-width: 480px){div#hs-eu-cookie-confirmation{font-size:12px !important}div#hs-eu-cookie-confirmation div#hs-eu-cookie-confirmation-inner{padding:8px 14px 14px !important}div#hs-eu-cookie-confirmation div#hs-eu-cookie-confirmation-inner a{font-size:12px !important}div#hs-eu-cookie-confirmation div#hs-eu-cookie-confirmation-inner a#hs-eu-confirmation-button{font-size:12px !important}div#hs-eu-cookie-confirmation div#hs-eu-cookie-confirmation-inner p{font-size:12px !important;margin-bottom:12px !important;line-height:15px !important}}@media only screen and (min-width: 960px){div#hs-eu-cookie-confirmation{position:fixed}div#hs-eu-cookie-confirmation.hs-cookie-notification-position-bottom{border-bottom:0;bottom:0;top:auto;box-shadow:0 -1px 3px #eaf0f6}div#hs-eu-cookie-confirmation.hs-cookie-notification-position-bottom-left{border-bottom:0;border-right:1px solid #cbd6e2;bottom:0;box-shadow:1px -1px 3px #eaf0f6;left:0;max-width:600px;right:auto;top:auto;width:45%}}
+</style><div id="hs-eu-cookie-confirmation" class="hs-cookie-notification-position-bottom can-use-gradients" data-nosnippet=""><div id="hs-eu-cookie-confirmation-inner"><p style=""></p><p></p><p><strong>This website uses cookies. </strong></p><p> We use our own and third-party cookies to improve our services, personalize your advertising and remember your preferences. </p><p>To find out more about the types of cookies we use and how to disable them, see our <a href="https://www.nordicsemi.com/About-us/Privacy-Policy" target="_blank">privacy policy</a>.</p><p></p><div id="hs-en-cookie-confirmation-buttons-area"><a href="https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/posts/instrumenting-with-segger-systemview?CommentId=65e44d50-75c4-4359-87bc-2313f8368a2d#" id="hs-eu-confirmation-button">Accept</a></div></div></div><!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WR7GSKT" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) --><form name="ctl01" method="post" action="https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/posts/instrumenting-with-segger-systemview?CommentId=65e44d50-75c4-4359-87bc-2313f8368a2d" id="ctl01" novalidate="novalidate">
+<div>
+<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="4yxQgm2cp/VlNrkvUhDTLRsa6XYLgefFb3p8wMHp0/IVSdN7Lo3Hk9u++CfrRqDldivFfwHFC5l50/AJeS3MJUNo1mcRY1kVE+t4CjaWUe4VR/MI+i55s+zEd9ZMuzZQITmcORGGHUhy2Nht1jd8yUMQ8Gf3yudfB3I7X4l8aA3TSIbYkYqkI42Yl9T0bfxRSCSFAiRsS1P+177DvUvzfja7eRj2FpcxnUWubSI23ymcIVr86fdRhGCEgXn20SV6mZyN0nYCfUPyAjICHPOIVTWdaUPWM5qXYLbp13kH5skP+0F4CL9Eyb8VQxvly23LGv0yUvwE3A2/BXsEPsInKS8gJvLMuWvcoWM3FqjsQPiTLxMMyF9EDVi+e3nQooegc3M7f4sgiyoHpVrrRqPsUq83+4RKYmbNOZHbJGTu/rL1mFn4Ui4dG+R9LNr97uhuJLndA0dh/CNg8y7teRONoQ==">
+</div>
+
+
+<script src="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/WebResource.axd" type="text/javascript"></script>
+<script src="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/WebResource(1).axd" type="text/javascript"></script>
+<script src="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/WebResource(2).axd" type="text/javascript"></script>
+<div>
+
+	<input type="hidden" name="__VIEWSTATEGENERATOR" id="__VIEWSTATEGENERATOR" value="C21772F6">
+</div><div class="header-fragments-header"></div>
+<div class="single-column header-fragments evolution-reflow-container" data-related="ctl02_ctl01_page" id="ctl02_ctl01_singlecolumn" style="display:none"></div><div class="header-fragments evolution-reflow-container" data-related="ctl02_ctl01_singlecolumn" id="ctl02_ctl01_page"><div class="layout">
+<div class="layout-header"></div>
+<div class="layout-content header-top-content" id="ctl02_ctl01_layout"><div class="layout-region header" id="ctl02_ctl01_header">
+<div class="layout-region-inner header"><div class="content-fragment nordic-site-banner no-wrapper responsive-1" id="header-29" data-reflow="ctl02_ctl01_header,ctl02_ctl01_singlecolumn,1,0,0">
+<div class="content-fragment-content">
+<style type="text/css">
+    .nordic-site-banner a > img{
+    display:inline-block;
+}
+
+.nordic-site-banner .navbar-inline{
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.nordic-site-banner .burger-menu{
+    display: inline-block;
+    margin-top: 28px;
+}
+
+.nordic-site-banner .burger-menu:hover{
+    cursor:pointer;
+}
+
+.nordic-site-banner .burger-menu::before{
+    text-indent: 0;
+    height: 24px;
+    display:inline-block;
+    width: 44px;
+    content: "\e811";
+    font-family: Entypo;
+    font-size: 44px;
+}
+
+.nordic-site-banner .burger-menu > ul{
+    display:none;
+    background: white;
+    width: 100%;
+    color: black;
+    position: absolute;
+    text-align: left;
+    top: 140px;
+    left: 0;
+    z-index: 10;
+}
+
+.nordic-site-banner .burger-menu > ul > li{
+    padding-left: 20px !important;
+}
+
+.nordic-site-banner{
+    font-weight: 200;
+    font-family: "GT Eesti", "Source Sans Pro", Helvetica, Arial, sans-serif;
+}
+
+.nordic-site-banner .banner-dark input{
+    background:none;
+    color: white;
+}
+
+.nordic-site-banner .break-spacer{
+    height: 20px;
+}
+
+.nordic-site-banner .banner-dark input::placeholder{
+    color: white;
+}
+
+.nordic-site-banner .banner-light{
+    background: white;
+    color: black;
+}
+
+.nordic-site-banner .banner-dark{
+    background: #333f48;
+    color: white;
+}
+
+.nordic-site-banner fieldset{
+    display: inline;
+    width: 200px;
+}
+
+.nordic-site-banner .popup-list-count {
+    position: absolute;
+    top: -10px;
+    left: -2px;
+    background-color: #f15922;
+    color: white !important;
+    font-size: 10.5px;
+    display: block;
+    width: 15px;
+    height: 15px;
+    line-height: 15px;
+    text-align: center;
+    z-index: 100;
+    -webkit-text-stroke-width: 0px !important;
+    -webkit-border-radius: 500px;
+    -moz-border-radius: 500px;
+    border-radius: 500px;
+}
+
+.nordic-site-banner .navbar-buttons-compact{
+    display: none;
+    text-align: left;
+    margin-right: 20px;
+}
+
+.nordic-site-banner .logo-compact{
+    display: none;
+}
+
+.nordic-site-banner fieldset input{
+    width: 100%; 
+    margin-left: 10px;
+}
+
+.nordic-site-banner fieldset input::placeholder,
+.nordic-site-banner fieldset input::-webkit-input-placeholder,
+.nordic-site-banner fieldset input::-ms-input-placeholder{
+    color: white !important;
+}
+
+.nordic-site-banner .navbar-buttons{
+    padding-top: 32px;
+    margin-left: 20px;
+    text-align: center;
+     
+}
+
+.layout-region.header{
+    border: none !important;
+}
+
+.layout-region.header .layout-region-inner{
+    max-width: none !important;
+    padding: 0 !important;
+}
+
+.nordic-site-banner .clear{
+    clear: both;
+}
+
+.nordic-site-banner .support-add{
+    background: url(/cfs-filesystemfile/__key/defaultwidgets/5c80128995a34929b72ae6ae126845e9-799025da7b894fb19da85b7a62222516/addLight.png?_=637087261522848347);
+    width: 12px;
+    height: 12px;
+}
+
+.nordic-site-banner .banner-light .support-add{
+    background: url(/cfs-filesystemfile/__key/defaultwidgets/5c80128995a34929b72ae6ae126845e9-799025da7b894fb19da85b7a62222516/add.png?_=637087261522848347);
+}
+
+.header-fragments .page-management-shade {
+    height: 190px;
+}
+
+.layout-content.header-top-content{
+    overflow: visible;
+}
+
+.nordic-site-banner .navbar-spacer{
+    display: inline-block;
+    margin:0 10px;
+    color: grey;
+}
+
+.nordic-site-banner .navbar-home{
+    background: url(/cfs-filesystemfile/__key/defaultwidgets/5c80128995a34929b72ae6ae126845e9-799025da7b894fb19da85b7a62222516/homeLight.png?_=637087261523160994);
+    width: 18px;
+    height: 18px;
+}
+
+.nordic-site-banner .banner-light .navbar-home{
+    background: url(/cfs-filesystemfile/__key/defaultwidgets/5c80128995a34929b72ae6ae126845e9-799025da7b894fb19da85b7a62222516/home.png?_=637087261523004623);
+}
+
+.nordic-site-banner .navbar-spacer::after{
+    content: "|";
+}
+
+.nordic-site-banner a{
+    color: inherit !important;
+}
+
+.nordic-site-banner .devzone-logo{
+    background: url(/cfs-filesystemfile/__key/defaultwidgets/5c80128995a34929b72ae6ae126845e9-799025da7b894fb19da85b7a62222516/devZoneLight.png?_=637087261523004623);
+    width: 181px;
+    height: 74px;
+    margin-right: 20px;
+}
+
+.nordic-site-banner .banner-light .devzone-logo{
+    background: url(/cfs-filesystemfile/__key/defaultwidgets/5c80128995a34929b72ae6ae126845e9-799025da7b894fb19da85b7a62222516/devZone.png?_=637087261523004623);
+}
+
+.nordic-site-banner .user-segment{
+    background: url(/cfs-filesystemfile/__key/defaultwidgets/5c80128995a34929b72ae6ae126845e9-799025da7b894fb19da85b7a62222516/cornerSmallSliced.png?_=637087261523004623);
+    width: 300px;
+    height: 140px;
+    float: right;
+    text-align: right;
+    padding-top: 14px;
+    padding-right: 20px;
+}
+
+.nordic-site-banner .user-segment-mobile {
+    float: right;
+    display: none;
+    text-align: right;
+}
+
+.nordic-site-banner .bell{
+    background: url(/cfs-filesystemfile/__key/defaultwidgets/5c80128995a34929b72ae6ae126845e9-799025da7b894fb19da85b7a62222516/bell.png?_=637087261522848347);
+    width: 20px;
+    height: 22px;
+    display: inline-block;
+}
+
+.nordic-site-banner .bookmark-icon{
+    background: url(/cfs-filesystemfile/__key/defaultwidgets/5c80128995a34929b72ae6ae126845e9-799025da7b894fb19da85b7a62222516/bookmark.png?_=637087261523004623);
+    width: 20px;
+    height: 22px;
+    display: inline-block;
+}
+
+.nordic-site-banner .inbox-icon{
+    background: url(/cfs-filesystemfile/__key/defaultwidgets/5c80128995a34929b72ae6ae126845e9-799025da7b894fb19da85b7a62222516/inbox.png?_=637087261523160994);
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    margin-right: 3px;
+}
+
+.nordic-site-banner .user-loggedout{
+    background: url(/cfs-filesystemfile/__key/defaultwidgets/5c80128995a34929b72ae6ae126845e9-799025da7b894fb19da85b7a62222516/user.png?_=637087261523160994);
+    width: 24px;
+    height: 23px;
+    display: inline-block;
+}
+
+.nordic-site-banner .down-arrow{
+    background: url(/cfs-filesystemfile/__key/defaultwidgets/5c80128995a34929b72ae6ae126845e9-799025da7b894fb19da85b7a62222516/down.png?_=637087261523004623);
+    width: 13px;
+    height: 7px;
+    display: inline-block;
+    margin-bottom: 7px;
+    margin-left: 5px;
+}
+
+.nordic-site-banner .nordic-logo{
+    background:url(/cfs-filesystemfile/__key/defaultwidgets/5c80128995a34929b72ae6ae126845e9-799025da7b894fb19da85b7a62222516/logo.png?_=637087261523160994);
+    width: 137px;
+    height: 140px;
+    float: left;
+    margin-left: 20px;
+}
+
+.nordic-site-banner .nordic-logo{
+    border: 1px solid lightgrey;
+    border-top: none;
+}
+
+.nordic-site-banner .support-button{
+    border: 1px solid white;
+    margin-left: 20px;
+    padding: 10px;
+}
+
+.nordic-site-banner .banner-light .support-button{
+    border: 1px solid lightgrey;
+}
+
+.nordic-site-banner .content-fragment-content{
+    margin-top: 0 !important;
+}
+
+.header-fragments::after{
+    background: none !important;
+}
+
+.header-fragments{
+    position: static !important;
+}
+
+/* Enforcing some spacing for the point at which the banner is no longer sticky */
+.header-fragments > .layout > .layout-header{
+    /* padding-bottom: 140px;*/
+}
+
+.nordic-site-banner .navbar-options{
+    display: inline;
+}
+
+.nordic-site-banner .add-ticket-button{
+    margin-top: -10px;
+    margin-bottom: 10px;
+}
+
+.nordic-site-banner .search-and-add{
+    display: inline-block;
+}
+
+@media (max-width: 1399px) {
+    .navbar-buttons .search-and-add{
+        display: block;
+        text-align: center;
+        padding-top: 10px;
+    }
+    
+    .nordic-site-banner .devzone-logo-link{
+        float: left;
+        padding-left: 10px;
+    }
+}
+
+@media (max-width: 1010px) {
+    .nordic-site-banner .navbar-options{
+        display: none;
+    }
+    .navbar-buttons-compact{
+        display: block !important;
+    }
+    .nordic-site-banner .user-segment-mobile{
+        display: inline-block;
+				border: solid 1px;
+		padding: 3px 3px 0px 3px;
+    }
+    .nordic-site-banner .user-segment{
+        display:none;
+    }
+    .content-fragment-page > .layout {
+        padding-left: 0px !important;
+        padding-right: 0px !important;
+    }
+    
+    .navbar-buttons .search-and-add{
+        float: right;
+        margin-right: 20px;
+        clear: right;
+    }
+	
+	.nordic-site-banner .burger-menu{
+        margin-right: 0;
+        margin-top: 0;
+        display: inline-block;
+        vertical-align: middle;
+		position:absolute;
+		right:100px;
+		top: 45px;
+    }
+	.nordic-site-banner .burger-menu > ul{
+		position: fixed;
+		top:70px;
+	}
+}
+
+@media (max-width: 740px) {
+    .nordic-site-banner .devzone-logo-link, .nordic-site-banner .nordic-logo-link{
+        display: none;
+    }
+    .navbar-buttons .support-button{
+        margin-left:0;
+    }
+    .navbar-buttons .search-and-add{
+        float: none;
+    }
+    .navbar-buttons .search-and-add > fieldset{
+        float: left;
+    }
+    .navbar-buttons .search-and-add > a{
+        float: right;
+    }
+    .nordic-site-banner .logo-compact{
+        display: inline-block;
+        background: url(/cfs-filesystemfile/__key/defaultwidgets/5c80128995a34929b72ae6ae126845e9-799025da7b894fb19da85b7a62222516/logo_2D00_compact.png?_=637087261523160994);
+        width: 200px;
+        height: 70px;
+        vertical-align: middle;
+    }
+    .nordic-site-banner .navbar-buttons-compact{
+        text-align: left;
+    }
+    .nordic-site-banner .burger-menu{
+        margin-right: 0;
+        margin-top: 0;
+        display: inline-block;
+        vertical-align: middle;
+		position:absolute;
+		right:100px;
+		top:25px;
+    }
+    .nordic-site-banner .navbar-buttons{
+        padding-top: 0;
+        margin-left: 0;
+    }
+    .nordic-site-banner .user-segment-mobile{
+        margin-top: 12px;
+		border: solid 1px;
+		padding: 3px 3px 0px 3px;
+    }
+	
+	.nordic-site-banner .burger-menu > ul{
+		position: fixed;
+		top:50px;
+	}
+}
+
+@media (max-width: 340px) {
+    .nordic-site-banner .user-segment-mobile .user img{
+        width: 22px;
+        height: 22px;
+    }
+}
+
+</style>
+
+<div class="banner-dark" id="header-29_banner">
+    <a href="https://devzone.nordicsemi.com/" class="nordic-logo-link" style="text-decoration: none; border: none;">
+        <div class="nordic-logo"></div>
+    </a>
+
+    <div class="user-segment">
+                
+            	        
+                        
+                        
+    	    	    			    	    			    	    			    	    			    	    			    	    			    	    			    	    			    	    			    	    			    			        				    					    							<a href="https://devzone.nordicsemi.com/login?ReturnUrl=%2Fnordic%2Fnordic-blog%2Fb%2Fblog%2Fposts%2Finstrumenting-with-segger-systemview%3FCommentId%3D65e44d50-75c4-4359-87bc-2313f8368a2d" class="ui-tourtip internal-link user with-icon ui-tip" data-tourtipkey="t;2iWQeYl7sU+dqFt6YiIlFg;jOECOHIurZ6w6qqdFUDdzQ" data-tourtipmessage="Sign in or join the community." title="Join or sign in"><div class="user-loggedout"></div></a>
+    					    				    			    	    			    	    			    	    			    	    </div>
+    <div class="container handheld">
+        <div class="user-links" style="display:none" id="header-29_handheldBannerLinks"></div>
+    </div>
+    
+    <div class="navbar-buttons">
+        <a href="https://devzone.nordicsemi.com/" class="devzone-logo-link" style="border: none; text-decoration: none;">
+            <div class="navbar-inline devzone-logo"></div>
+        </a>
+        <div class="navbar-options">
+            <a href="https://devzone.nordicsemi.com/" style="border: none; text-decoration: none;">
+                <div class="navbar-inline navbar-home"></div>
+            </a>
+                                                <div class="navbar-spacer"></div>
+                    <div class="navbar-inline"><a href="https://devzone.nordicsemi.com/f/public-q-a">Tech Support</a></div>
+                                    <div class="navbar-spacer"></div>
+                    <div class="navbar-inline"><a href="https://devzone.nordicsemi.com/nordic/">Blogs and guides</a></div>
+                                          <div class="navbar-spacer"></div>
+        	  <div class="navbar-inline" data-minlinks="0" data-direction="vertical" data-maxlinks="0" data-reflow-wait-check-count="0" data-reflow-wait-timeout="null" data-finalized="true"><div class="container"><ul style="list-style: none; padding: 0px; margin: 0px; overflow: hidden; visibility: visible;"><li style="display: none;"><a href="https://devzone.nordicsemi.com/community/">Community</a></li><li style="display: none;"><a href="https://devzone.nordicsemi.com/nordic/">Nordic content</a></li><li><a href="https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/posts/instrumenting-with-segger-systemview?CommentId=65e44d50-75c4-4359-87bc-2313f8368a2d#" data-more="">More</a></li></ul></div></div>
+        </div>
+        <div class="navbar-buttons-compact">
+            <a href="https://devzone.nordicsemi.com/" style="text-decoration: none; border: none;">
+                <div class="logo-compact"></div>
+            </a>
+            <div class="burger-menu">
+    			<ul class="content-list content">
+    			                                                        <li class="content-item">
+                        		<div class="content"><a href="https://devzone.nordicsemi.com/f/public-q-a">Tech Support</a></div>
+                        	</li>
+                                                    <li class="content-item">
+                        		<div class="content"><a href="https://devzone.nordicsemi.com/nordic/">Blogs and guides</a></div>
+                        	</li>
+                                                                			                	                    			                	                    			                	                    			                	                    			                	                    			                	                    			                	                    			                	                    			                	                    			                	                    			                	                    			                	                    			                	                                       <li class="content-item">
+                       <div class="content"> <a href="https://devzone.nordicsemi.com/community/">Community</a></div>
+                    </li>
+                                    <li class="content-item">
+                       <div class="content"> <a href="https://devzone.nordicsemi.com/nordic/">Nordic content</a></div>
+                    </li>
+                                                    </ul>
+            </div>
+            <div class="user-segment-mobile">
+                                                            <a href="https://devzone.nordicsemi.com/login?ReturnUrl=%2Fnordic%2Fnordic-blog%2Fb%2Fblog%2Fposts%2Finstrumenting-with-segger-systemview%3FCommentId%3D65e44d50-75c4-4359-87bc-2313f8368a2d" class="user"><div class="user-loggedout mobile"></div></a>
+                                                </div>
+        </div>
+        <div class="search-and-add">
+        	<fieldset class="search" id="header-29_searchFields">
+    			<span class="field-item-description hidden">
+    				<label>Search</label>
+    			</span>
+    			<span class="field-item-input">
+    				<input autocomplete="off" type="search" placeholder="Search the DevZone" id="header-29_Search" value="">
+    			</span>
+        	</fieldset>
+            
+            <a href="https://devzone.nordicsemi.com/support/add" class="add-ticket-button">
+                <div class="support-button" style="display: inline-block;">
+                    Support 
+                    <div class="navbar-inline support-add"></div>
+                </div>
+            </a>
+        </div>
+    </div>
+    <div class="clear"></div>
+</div>
+
+
+</div>
+<div class="content-fragment-footer"></div>
+</div>
+<div class="content-fragment navigation-custom no-wrapper responsive-1" id="header-55" data-reflow="ctl02_ctl01_header,ctl02_ctl01_singlecolumn,1,0,1">
+<div class="content-fragment-content">
+<style type="text/css">
+    .navigation-custom{
+    position: static !important;
+}
+
+.navigation-custom:after{
+    content: none !important;
+}
+
+.nav-bg{
+    /* Forces the widget to be full width without including it in the header (as that would make it fixed) */
+
+    background: #e4eaeb;
+    height: 45px;
+    width: calc(100vw - 17px);
+    position:absolute; /* Less ugly */
+    left: 0px;
+
+}
+
+</style>
+
+<div class="nav-bg"></div>
+
+
+				
+
+
+			<div class="navigation-list links" id="header-55_container" data-minlinks="0" data-direction="horizontal" data-maxlinks="2" data-reflow-wait-check-count="0" data-reflow-wait-timeout="null" style="display: block; overflow: hidden; height: 44px;" data-finalized="true"><div class="container" style="overflow: auto hidden; height: 64px; visibility: visible;"><ul style="list-style: none; padding: 0px; margin: 0px; overflow: hidden; display: flex; width: 1060px;"><li class="navigation-list-item"><a data-groupid="15" href="https://devzone.nordicsemi.com/community/" style="white-space: normal;">
+						Community
+					</a></li><li class="navigation-list-item"><a data-groupid="16" href="https://devzone.nordicsemi.com/nordic/" class="selected" style="white-space: normal;">
+						Nordic content
+					</a><ul class="children" style="display: none; white-space: normal;">
+																			<li>
+																																																										<a href="https://devzone.nordicsemi.com/nordic/backstage/">Backstage</a>
+							</li>
+																			<li>
+																																																										<a href="https://devzone.nordicsemi.com/nordic/short-range-guides/">Short-range guides</a>
+							</li>
+																			<li>
+																																																										<a href="https://devzone.nordicsemi.com/nordic/power/">Online power profiler</a>
+							</li>
+																			<li>
+																																																																			<a href="https://devzone.nordicsemi.com/nordic/nordic-blog/" class="selected">Nordic Blog</a>
+							</li>
+																			<li>
+																																																										<a href="https://devzone.nordicsemi.com/nordic/cellular-iot-guides/">Cellular IoT guides</a>
+							</li>
+																				</ul></li><li style="display: none;"></li></ul></div></div>
+		
+			</div>
+<div class="content-fragment-footer"></div>
+</div>
+</div>
+</div>
+<div class="layout-region content" id="ctl02_ctl01_content">
+<div class="layout-region-inner content"><div class="content-fragment group-banner no-wrapper responsive-1" id="header-31" data-reflow="ctl02_ctl01_content,ctl02_ctl01_singlecolumn,1,1,2">
+<div class="content-fragment-content">
+
+
+
+	
+	
+		
+	
+								
+<style>
+		
+		
+		.single-column.header-fragments,
+		.header-fragments .layout .header-top-content .layout-region.content,
+		.header-fragments .layout .header-top-content.with-adaptable-elements .layout-region.content {
+			background: #ffffff;
+		}
+
+	
+				.single-column.header-fragments {}
+
+		.header-fragments .layout .header-top-content:not(.scrolled) .layout-region.content,
+		.header-fragments .layout .header-top-content.with-adaptable-elements:not(.scrolled) .layout-region.content {
+			 border-bottom: 1px solid #CFD8DC;
+		}
+
+		.header-fragments .layout .header-top-content:not(scrolled) {
+			box-shadow: none;
+		}
+		.header-fragments .layout .header-top-content.scrolled {
+			box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+		}
+		
+	/* parent navigation */
+	.banner.context.slim .hierarchy > .parent-navigation a.more:before,
+	.banner.context > .hierarchy > .parent-navigation ul li a,
+	.banner.context > .hierarchy > .parent-navigation ul li a:hover,
+	.banner.context > .hierarchy > .parent-navigation ul li a:before,
+	.scrolled .banner.context > .hierarchy > .parent-navigation a.more:before,
+	.scrolled .banner.context > .hierarchy > .parent-navigation ul li a:before,
+	.banner.context > .hierarchy > .parent-navigation ul li a.more.links-expanded,
+	.banner.context > .hierarchy > .parent-navigation ul li a.more.links-expanded:before,
+	.banner.context > .hierarchy > .parent-navigation ul li a.more:before {
+		color: #263238;
+	}
+
+	/* hierarchy components */
+	.banner.context > .hierarchy > .current-hierarchy > .hierarchy-component,
+	.banner.context > .hierarchy > .current-hierarchy > .hierarchy-component a,
+	.banner.context > .hierarchy > .current-hierarchy > .hierarchy-component:before,
+	.banner.context > .hierarchy > .current-hierarchy > .hierarchy-component a:hover {
+		color: #263238;
+	}
+
+	/* applications */
+	.banner.context > .hierarchy > .current-hierarchy > .applications ul a,
+	.banner.context > .hierarchy > .current-hierarchy > .applications ul a:hover,
+	.banner.context > .hierarchy > .current-hierarchy > .applications ul a.more,
+	.banner.context:not(.home) > .hierarchy > .current-hierarchy > .applications ul a.more,
+	.banner.context:not(.home) > .hierarchy > .current-hierarchy > .applications ul a.more:before,
+	.banner.context.home > .hierarchy > .current-hierarchy > .applications ul a.more:before,
+	.scrolled .banner.context .hierarchy .current-hierarchy > .applications ul a.more,
+	.scrolled .banner.context .hierarchy .current-hierarchy > .applications ul a.more:before,
+	.banner.context.slim:not(.home) > .hierarchy > .current-hierarchy > .applications ul a.more,
+	.banner.context.slim:not(.home) > .hierarchy > .current-hierarchy > .applications ul a.more:before,
+	.scrolled .banner.context:not(.home) > .hierarchy > .current-hierarchy > .applications ul a.more,
+	.scrolled .banner.context:not(.home) > .hierarchy > .current-hierarchy > .applications ul a.more:before {
+		border-color: #263238;
+		color: #263238;
+	}
+	.banner.context.home > .hierarchy > .current-hierarchy > .applications ul a.links-expanded,
+	.banner.context.home > .hierarchy > .current-hierarchy > .applications ul a.links-expanded:before,
+	.banner.context.home > .hierarchy > .current-hierarchy > .applications ul a.more.links-expanded:before,
+	.scrolled .banner.context .hierarchy .current-hierarchy > .applications ul a.more.links-expanded,
+	.scrolled .banner.context .hierarchy .current-hierarchy > .applications ul a.more.links-expanded:before,
+	.banner.context:not(.home) > .hierarchy > .current-hierarchy > .applications ul a.more.links-expanded,
+	.banner.context:not(.home) > .hierarchy > .current-hierarchy > .applications ul a.more.links-expanded:before,
+	.banner.context.slim:not(.home) > .hierarchy > .current-hierarchy > .applications ul a.more.links-expanded,
+	.banner.context.slim:not(.home) > .hierarchy > .current-hierarchy > .applications ul a.more.links-expanded:before,
+	.scrolled .banner.context:not(.home) > .hierarchy > .current-hierarchy > .applications ul a.more.links-expanded,
+	.scrolled .banner.context:not(.home) > .hierarchy > .current-hierarchy > .applications ul a.more.links-expanded:before {
+		background-color: #263238;
+		color: #ffffff;
+		border-color: #263238;
+	}
+
+	/* new */
+	.banner.context > .new ul a,
+	.banner.context .navigation-list.new ul a.links-expanded,
+	.banner.context .navigation-list.new ul a.links-expanded:hover,
+	.banner.context .navigation-list.new ul a.links-expanded:active,
+	.banner.context .navigation-list.new ul a:hover {
+		background-color: #263238;
+		color: #ffffff;
+	}
+	.single-column .banner.context > .new a,
+	.single-column .banner.context:not(.home) > .new a,
+	.single-column .banner.context.home > .new a {
+		color: #263238;
+		border-color: #263238;
+	}
+
+	/* inheriting application banner */
+	.banner.application,
+	.banner.application .navigation-list a,
+	.banner.application .name .title a {
+		color: #263238;
+	}
+	.banner.application::after {
+		background-color: #263238;
+	}
+
+
+	/* custom navigation widget */
+	.header-fragments .content-fragment.navigation-custom .navigation-list[data-direction='horizontal'] a,
+	.header-fragments .content-fragment.navigation-custom .navigation-list[data-direction='horizontal'] a:hover {
+		color: #263238;
+	}
+	.header-fragments .content-fragment.navigation-custom:after,
+	.header-fragments .content-fragment.navigation-custom .navigation-list[data-direction='horizontal'] a.selected:after {
+		background-color: #263238;
+	}
+	.header-fragments:hover .header-top-content .layout-region.content .content-fragment.navigation-custom .navigation-list[data-direction='horizontal'] a {
+		color: #263238;
+	}
+	.header-fragments .header-top-content .layout-region.content .content-fragment.navigation-custom .navigation-list[data-direction='horizontal'] a.links-expanded,
+	.header-fragments .header-top-content .layout-region.content .content-fragment.navigation-custom .navigation-list[data-direction='horizontal'] a.subnav-open,
+	.header-fragments:hover .header-top-content .layout-region.content .content-fragment.navigation-custom .navigation-list[data-direction='horizontal'] a.links-expanded,
+	.header-fragments:hover .header-top-content .layout-region.content .content-fragment.navigation-custom .navigation-list[data-direction='horizontal'] a.subnav-open {
+		background-color: #263238;
+		color: #ffffff;
+	}
+
+    .banner.context > .hierarchy > .parent-navigation ul li a {
+        font-size: .75em;
+    }
+
+    .banner.context > .hierarchy > .current-hierarchy > .nordic-applications ul a {
+        font-size: 1em;
+    }
+
+    .banner.context > .hierarchy > .current-hierarchy > .nordic-applications ul li a::before,
+    .banner.context > .hierarchy > .current-hierarchy > .nordic-applications ul li a::after {
+        opacity: 0;
+        display: inline-block !important;
+    }
+
+    .banner.context > .hierarchy > .current-hierarchy > .nordic-applications ul li a::before {
+        content: "{";
+        margin-right: .25em;
+    }
+
+    .banner.context > .hierarchy > .current-hierarchy > .nordic-applications ul li a::after {
+        content: "}";
+        margin-left: .25em;
+    }
+
+    .banner.context > .hierarchy > .current-hierarchy > .nordic-applications ul li a:hover::before,
+    .banner.context > .hierarchy > .current-hierarchy > .nordic-applications ul li a:hover::after {
+        opacity: .5;
+    }
+
+    .banner.context > .hierarchy > .current-hierarchy > .nordic-applications ul li.selected a::before,
+    .banner.context > .hierarchy > .current-hierarchy > .nordic-applications ul li.selected a::after {
+        opacity: 1;
+        color: #D0DF00;
+    }
+
+    .nordic-applications,
+    .nordic-ui-links {
+        width: 100%;
+    }
+    
+    .nordic-ui-links > ul {
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+    
+</style>
+
+
+
+
+
+
+
+
+
+
+<div class="banner context   with-ancestors ">
+	<div class="avatar">
+		<a href="https://devzone.nordicsemi.com/nordic/nordic-blog/">
+			<img src="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/defaulthub.gif-68x68x2.png" alt="Nordic Blog">
+		</a>
+	</div>
+
+	<div class="hierarchy">
+		<div class="parent-navigation" style="padding-left: 10px;">
+					<div class="" data-direction="horizontal" id="header-31_parentNavigation" data-maxlinks="50" data-reflow-wait-check-count="0" data-reflow-wait-timeout="null" data-finalized="true" style="overflow: hidden; height: 21px;"><div class="container" style="overflow: auto hidden; height: 41px; visibility: visible;"><ul style="list-style: none; padding: 0px; margin: 0px; overflow: hidden; display: flex; width: 837px;"><li class="navigation-list-item"><a class="crumb depth" href="https://devzone.nordicsemi.com/" style="white-space: normal;">Nordic DevZone</a></li><li class="navigation-list-item"><a class="crumb depth-0" href="https://devzone.nordicsemi.com/nordic/" style="white-space: normal;">Nordic content</a></li><li class="navigation-list-item"><a class="crumb depth-1" href="https://devzone.nordicsemi.com/nordic/nordic-blog/" style="white-space: normal;">Nordic Blog</a></li></ul></div></div>
+		</div>
+
+		<div class="current-hierarchy">
+
+
+							<div class="navigation-list applications nordic-applications">
+					<div class="nordic-ui-links with-group-selector" data-minlinks="0" data-maxlinks="50" data-direction="horizontal" id="header-31_applicationNavigation" data-reflow-wait-check-count="0" data-reflow-wait-timeout="null" data-finalized="true" style="overflow: hidden;"><div class="container" style="overflow: auto hidden; visibility: visible;"><ul style="list-style: none; padding: 0px; margin: 0px; overflow: hidden; display: flex; width: 837px;"><li style="display: none;"></li></ul></div></div>
+				</div>
+			
+		</div>
+
+	</div>
+
+	
+	
+			<div class="navigation-list new">
+			<div class="" data-direction="vertical" data-reflow-wait-check-count="0" data-reflow-wait-timeout="null" data-finalized="true"><div class="container"><ul style="list-style: none; padding: 0px; margin: 0px; overflow: hidden; visibility: visible;"><li class="navigation-list-item"><a href="https://devzone.nordicsemi.com/login?ReturnUrl=%2Fnordic%2Fnordic-blog%2Fb%2Fblog%2Fposts%2Finstrumenting-with-segger-systemview%3FCommentId%3D65e44d50-75c4-4359-87bc-2313f8368a2d">New</a></li></ul></div></div>
+		</div>
+		</div>
+
+
+			</div>
+<div class="content-fragment-footer"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="layout-footer"></div>
+</div></div><div class="header-fragments-footer"></div><div class="single-column content-fragment-page post evolution-reflow-container" data-related="ctl02_ctl02_page" id="ctl02_ctl02_singlecolumn" style="display:none"></div><div class="content-fragment-page post evolution-reflow-container" data-related="ctl02_ctl02_singlecolumn" id="ctl02_ctl02_page"><div class="layout">
+<div class="layout-header"></div>
+<div class="layout-content content-left-sidebar-right" id="ctl02_ctl02_layout"><div class="layout-region right-sidebar" id="ctl02_ctl02_right-sidebar" style="position: relative;">
+<div class="layout-region-inner right-sidebar" style="position: fixed; top: 0px; width: 230px;"><div id="fragment-580"></div>
+<div class="content-fragment blog-details no-wrapper responsive-2" id="fragment-157" data-reflow="ctl02_ctl02_right-sidebar,ctl02_ctl02_singlecolumn,2,5,1">
+<div class="content-fragment-content">
+
+
+
+
+<div class="content-details">
+
+						<div class="content-tags">
+				<ul class="tag-list">
+											<li class="tag-item">
+					<a href="https://devzone.nordicsemi.com/tags/segger%2bsystemview%2bnrf52%2bs132" rel="tag">segger systemview nrf52 s132</a>
+				</li>
+									</ul>
+			</div>
+			
+	<ul class="attribute-list">
+
+				
+		
+					<li class="attribute-item like ">
+				<span class="attribute-name"></span>
+				<span class="attribute-value">
+															<span class="ui-presentcontent ui-like ui-tip" data-presentcontents="4ede12c4e96f41bd93938ce94a608296|f7d226abd59f475c9d224a79e3f0ec07|" data-tipcontent="initialmessage" data-contentid="4ede12c4-e96f-41bd-9393-8ce94a608296" data-contenttypeid="f7d226ab-d59f-475c-9d22-4a79e3f0ec07" data-initialcount="2" data-initialstate="false" data-readonly="true" data-initialmessage="&lt;a href=&quot;/members/timf&quot; class=&quot;internal-link view-user-profile&quot;&gt;Tim&lt;/a&gt; and &lt;span class=&quot;who-likes&quot;&gt;1 other&lt;/span&gt; like this" data-format="{count}" data-configuration="Format=%7Bcount%7D&amp;IncludeLike=true&amp;IncludeTip=true&amp;LikeTypeId=00000000-0000-0000-0000-000000000000"><span class="like-count who-likes" data-count="2">2</span></span>
+				</span>
+			</li>
+		
+			</ul>
+</div>
+
+	</div>
+<div class="content-fragment-footer"></div>
+</div>
+<div class="content-fragment blog-links no-wrapper responsive-2" id="fragment-158" data-reflow="ctl02_ctl02_right-sidebar,ctl02_ctl02_singlecolumn,2,5,2">
+<div class="content-fragment-content">
+
+
+
+	<div class="navigation-list links" data-minlinks="2" data-direction="vertical" data-maxlinks="18" data-reflow-wait-check-count="0" data-reflow-wait-timeout="null" style="display: block;" data-finalized="true"><div class="container"><ul style="list-style: none; padding: 0px; margin: 0px; overflow: hidden; visibility: visible;"><li class="navigation-list-item"><a href="mailto:?subject=Instrumenting%20with%20Segger%20SystemView&amp;body=https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/posts/instrumenting-with-segger-systemview" class="internal-link email-post"><span></span>Share</a></li><li class="navigation-list-item"><a href="https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/posts/instrumenting-with-segger-systemview?CommentId=65e44d50-75c4-4359-87bc-2313f8368a2d#" onclick="jQuery.glowModal(&#39;/utility/scripted-file.ashx?CommentId=65e44d50-75c4-4359-87bc-2313f8368a2d\u0026_cf=subscribebyemail.vm\u0026_fid=158\u0026_ct=page\u0026_cp=post\u0026_ctt=a3b17ab0af5f11dda3501fcf55d89593\u0026_ctc=584024ec88b448a4aa4f1836f487255b\u0026_ctn=a4b603bd26214a2c832b0da0b8713054\u0026_cc=0\u0026_pcurl=~%2Fnordic%2Fnordic-blog%2Fb%2Fblog%2Fposts%2Finstrumenting-with-segger-systemview%3FCommentId%3D65e44d50-75c4-4359-87bc-2313f8368a2d\u0026BlogId=4&#39;, { width: 400, height: 200 }); return false;">Subscribe by email</a></li><li style="display: none;"></li></ul></div></div>
+
+			</div>
+<div class="content-fragment-footer"></div>
+</div>
+<div class="content-fragment more-content no-wrapper with-header with-spacing responsive-2 
+			as-slider
+		" id="fragment-159" data-reflow="ctl02_ctl02_right-sidebar,ctl02_ctl02_singlecolumn,2,5,3" style="display: none;">
+<div class="content-fragment-header">
+Related
+			</div>
+<div class="content-fragment-content">
+
+<div id="fragment-159_delayedPagedContentWrapper"><div id="pi159-paged-content">
+		
+
+	
+	
+																																			
+			
+														
+				
+	
+	
+		
+			<div class="avatar-list">
+		<ul class="content-list">
+		
+	
+		<li class="content-item" data-href="https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/posts/profiling-the-softdevice-and-freertos-with-segger-">
+			<a href="https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/posts/profiling-the-softdevice-and-freertos-with-segger-" class="internal-link view-full-post navigable">
+				<div class="content">Profiling the Softdevice and FreeRTOS with Segger SystemView</div>
+			</a>
+			<div class="author">
+				<div class="avatar">
+											<img src="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/anonymous.gif-35x35x2.png" border="0px" alt="Tim">
+									</div>
+				<div class="meta">
+					<a href="https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/posts/profiling-the-softdevice-and-freertos-with-segger-" class="internal-link view-post navigable">
+						 In a previous blog post , RK has shown us how to use Segger SystemView to monitor a bare-metal application as well as the Softdevice. Based on his work, we will see how to go further and add FreeRTOS...
+					</a>
+				</div>
+			</div>
+		</li>
+			
+	
+		<li class="content-item" data-href="https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/posts/segger-embedded-studio-blog-post-rev2-deprecated">
+			<a href="https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/posts/segger-embedded-studio-blog-post-rev2-deprecated" class="internal-link view-full-post navigable">
+				<div class="content">Segger Embedded Studio blog post rev2 DEPRECATED</div>
+			</a>
+			<div class="author">
+				<div class="avatar">
+											<img src="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/4U30GC3Q94LZ.jpg-35x35x2.jpg" border="0px" alt="Michael Dietz">
+									</div>
+				<div class="meta">
+					<a href="https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/posts/segger-embedded-studio-blog-post-rev2-deprecated" class="internal-link view-post navigable">
+						 Depreceted 
+ see new blog post for new version of embedded studio here: 
+ https://devzone.nordicsemi.com/blogs/1032/segger-embedded-studio-a-cross-platform-ide-w-no-c/ 
+ #Introduction
+This post is...
+					</a>
+				</div>
+			</div>
+		</li>
+			
+	
+		<li class="content-item" data-href="https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/posts/segger-embedded-studio-a-cross-platform-ide">
+			<a href="https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/posts/segger-embedded-studio-a-cross-platform-ide" class="internal-link view-full-post navigable">
+				<div class="content">Segger Embedded Studio - A Cross Platform IDE</div>
+			</a>
+			<div class="author">
+				<div class="avatar">
+											<img src="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/4U6HVYWENFZM.png-35x35x2.png" border="0px" alt="Hung Bui">
+									</div>
+				<div class="meta">
+					<a href="https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/posts/segger-embedded-studio-a-cross-platform-ide" class="internal-link view-post navigable">
+						 Download and Setup 
+ 
+ Download Embedded Studio &gt;= v3.10e 
+ Download and install the J-Link Software and Documentation Pack &gt;= v6.10g 
+ Download and unzip Nordic's nRF5 SDK &gt;= v12.0.1 
+ 
+ Note:...
+					</a>
+				</div>
+			</div>
+		</li>
+			
+	
+		<li class="content-item" data-href="https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/posts/segger-embedded-studio-nordic-edition-updates-v4-16">
+			<a href="https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/posts/segger-embedded-studio-nordic-edition-updates-v4-16" class="internal-link view-full-post navigable">
+				<div class="content">SEGGER Embedded Studio Nordic edition updates v4.16</div>
+			</a>
+			<div class="author">
+				<div class="avatar">
+											<img src="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/4U6HVYWENFZM.png-35x35x2.png" border="0px" alt="Hung Bui">
+									</div>
+				<div class="meta">
+					<a href="https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/posts/segger-embedded-studio-nordic-edition-updates-v4-16" class="internal-link view-post navigable">
+						 Recently, we've updated the SEGGER Embedded Studio Nordic edition (SES) to version 4.16 (SES Nordic Edition is special version of SES built specifically for nRF Connect SDK ). 
+ This updated version introduced...
+					</a>
+				</div>
+			</div>
+		</li>
+			
+	
+		<li class="content-item" data-href="https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/posts/segger-embedded-studio-part-2-monitor-mode-debuggi">
+			<a href="https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/posts/segger-embedded-studio-part-2-monitor-mode-debuggi" class="internal-link view-full-post navigable">
+				<div class="content">SEGGER Embedded Studio Part 2 - Monitor Mode Debugging</div>
+			</a>
+			<div class="author">
+				<div class="avatar">
+											<img src="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/4U30GC3Q94LZ.jpg-35x35x2.jpg" border="0px" alt="Michael Dietz">
+									</div>
+				<div class="meta">
+					<a href="https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/posts/segger-embedded-studio-part-2-monitor-mode-debuggi" class="internal-link view-post navigable">
+						 This tutorial will take less than 15 minutes. 
+ #Motivation
+Never lose a BLE connection when debugging your applications again! This technique will also be useful for any application using the PWM peripheral...
+					</a>
+				</div>
+			</div>
+		</li>
+				</ul>
+	</div>
+	</div>
+</div>
+
+
+
+
+
+			</div>
+<div class="content-fragment-footer"></div>
+</div>
+<div class="content-fragment more-content no-wrapper with-header with-spacing responsive-2 
+			as-list
+		" id="fragment-160" data-reflow="ctl02_ctl02_right-sidebar,ctl02_ctl02_singlecolumn,2,5,4" style="display: none;">
+<div class="content-fragment-header">
+Recommended
+			</div>
+<div class="content-fragment-content">
+
+<div id="fragment-160_delayedPagedContentWrapper"></div>
+
+
+
+
+
+			</div>
+<div class="content-fragment-footer"></div>
+</div>
+</div>
+<div class="layout-region-inner right-sidebar" visibility="hidden" style="height: 159px; display: block;"></div></div>
+<div class="layout-region content" id="ctl02_ctl02_content">
+<div class="layout-region-inner content"><div class="content-fragment blog-title no-wrapper responsive-1" id="fragment-162" data-reflow="ctl02_ctl02_content,ctl02_ctl02_singlecolumn,1,1,5">
+<div class="content-fragment-content">
+        	
+			<h1 class="title">Instrumenting with Segger SystemView</h1>
+			</div>
+<div class="content-fragment-footer"></div>
+</div>
+<div id="fragment-163"></div>
+<div class="content-fragment blog-post-byline no-wrapper with-spacing responsive-1" id="fragment-164" data-reflow="ctl02_ctl02_content,ctl02_ctl02_singlecolumn,1,1,7">
+<div class="content-fragment-content">
+
+
+
+<div class="content-details">
+	<div class="content-author">
+		<div class="avatar">
+							<a href="https://devzone.nordicsemi.com/members/rols">
+					<img src="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/anonymous.gif-80x80x2.png" border="0px" alt="RK">
+				</a>
+					</div>
+		<span class="user-name">
+							<a href="https://devzone.nordicsemi.com/members/rols" class="internal-link view-user-profile">
+					RK
+				</a>
+					</span>
+	</div>
+	<div class="content-date">
+		9 Jun 2016
+	</div>
+</div>
+
+		</div>
+<div class="content-fragment-footer"></div>
+</div>
+<div id="fragment-165"></div>
+<div class="content-fragment blog-post no-wrapper with-spacing responsive-1" id="fragment-166" data-reflow="ctl02_ctl02_content,ctl02_ctl02_singlecolumn,1,1,9">
+<div class="content-fragment-content">
+
+
+
+
+
+<div class="content full text">
+			<div class="content"><p>Segger has recently released a number of tools, some of them free, which work with Segger's JLink debuggers, One of those is SystemView, a real-time analysis and visualisation tool. It's cross platform and <a href="https://www.segger.com/systemview.html?p=1731">Segger's page for it is here</a>.</p>
+<p>SystemView uses Segger RTT, which is really just a small memory buffer on the target device which the JLink probe constantly reads, to transfer instrumentation data from the target and then display it in a timeline.</p>
+<p>SystemView has concepts of task, interrupt and event and the most natural use of it is instrumenting a real time operating system (RTOS), in fact it comes with the source necessary to instrument FreeRTOS as well as embOS, Segger's RTOS. However the instrumentation API is documented and available to add to your own code, so I put some code together to instrument the softdevice calls and events as well as interrupts to see how well it lets you visualise an app running on an nRF52.</p>
+<p>If you download SystemView, at least version 2.36a you should be able to look at the saved trace file, <a href="https://devzone.nordicsemi.com/cfs-file/__key/communityserver-blogs-components-weblogfiles/00-00-00-00-04-DZ-952/7026.RemoteSession.SVDat">RemoteSession.SVDat</a>.</p>
+<p>In order to see the calls properly labelled you also need the definition file, which is this one, <a href="https://devzone.nordicsemi.com/cfs-file/__key/communityserver-blogs-components-weblogfiles/00-00-00-00-04-DZ-952/6518.SYSVIEW_5F00_Softdevice.txt">SYSVIEW_Softdevice.txt</a>.</p>
+<p>That file has to be placed in the 'description' subdirectory which is in the same place as the SystemView executable and you need (at least on OSX) to run SystemView directly from that location or it doesn't read the file. On Windows you may just be able to put the txt file in the right place and double click .. I've reported this to Segger and hope it will get fixed. There's more about the right directory for this file in the manual which comes with the software.</p>
+<p>If you have it working, it should look something like this</p>
+<p><img src="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/1321.image1.jpg" alt="image description"></p>
+<p>So what we have here is one session of one of my own apps. It's a bluetooth remote control which allows you to turn a number of relays on and off and also program it with a timed sequence. This app uses advertising to report some of its state, even when it's in connection, so multiple clients can see what's going on, even though only one can be connected at any time, so the advertising data is occasionally updated.</p>
+<p>In this log the device advertises for a while, then I connect to it, change some of the switch states, program in a sequence to run and after it's complete, disconnect again. Then another client connects and disconnects. I set it up to log the RADIO interrupt (because it's fun), RTC1, which I use as the timer for the timeline, SWI2 which is the softdevice 'you have events interrupt' and all SVC calls and events.</p>
+<p>Because this isn't an RTOS there really are no tasks, however the instrumentation code pretends that there are, a User task, a Softdevice task for all your sd_* calls and an Event task where all incoming events are shown. This has the slightly annoying feature that each time it switches between tasks you get a 'Task Run' message, but I think it's worth the clutter to get the breakdown.</p>
+<p>At a high level you can see that the RADIO interrupt, which is in red, ticks along during the advertising periods at the start and end but when in connection fires constantly, as you'd expect.</p>
+<p>The top line (just below Unified) is the SWI2 interrupt, each time that fires you are getting an event, and you can see that too in the Event line at the bottom, after every SWI2 interrupt, the app fetches events. Usually after an event is fetched there's something to do, so the lines showing Softdevice, the line above, occur just after the incoming events. Finally you can see the RTC1 interrupt, my timeline ran for 30 seconds, 5 seconds at a time before turning itself off and you can see each of the ticks when it fired.</p>
+<p>The top panel shows a list of all the events which happen, including the ones which fake task changes, you can filter those out  and just select API calls with View-&gt;Event Filter-&gt;Show APIs only and if you do that, the top of the log shows something like this</p>
+<p><img src="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/7651.image2.jpg" alt="image description"></p>
+<p>Each line is either a svcall, of a given type, or an evt_get or a ble_evt_get. The return is shown, should usually be 0x00, the name of the svc call plus possibly some of the input arguments and some of the returned values, eg</p>
+<div class="content-scrollable-wrapper" style="max-width: 100%; overflow: auto; max-height: none;"><pre><code>ble_enable() -&gt; ram_base=0x20001fe8
+</code></pre></div>
+<p>shows that ble_enable() was called and ram_base it returned was 0x20001fe8, a few lines further down a UUID is added, the uuid sent in is shown and the handle returned, 0x02 is at the end of the line.</p>
+<p>Apart from the buffer overflow (I didn't make it quite large enough for the test) you can see a fairly standard startup, enabling the softdevice and bluetooth, adding a service and then you miss the next bit of adding characteristics and starting advertising.</p>
+<p>If you keep scrolling down you'll see the client connecting, security being established as this client is bonded, writing values (authorized writes), values being set and notified, advertising data being encoded and set (as the state changes, so the advertising data is updated) and eventually a disconnection.</p>
+<p>Turning off the filters again to show all events (View-&gt;Event Filter-&gt;Reset All Filters) and going to event 96576 (Go-&gt;Go To Event...) then zooming in you'll get a picture like this</p>
+<p><img src="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/4011.image3.jpg" alt="image description"></p>
+<p>unfortunately my capture program doesn't capture tooltips, if you mouse around that view you'll get a tooltip which shows the previous event in the same format as the log file at the top, which is very handy. You can also see this sequence in the log viewer at the top of the screen.</p>
+<p>So what we see here is the sequence starts with an SWI2 interrupt to tell the app there are events waiting. The first one is an evt_get() which returns no events, then a ble_evt_get() which returns the connection event, which is logged with some of the details about connection interval and slave latency. If you look in the event logger or mouse over the softdevice event which follows you'll see it's a svcall_gap, ble_gap_adv_start(), that's the app re-starting advertising in non-connectable mode so that other clients can still read the state. Finally there are no more events and the app goes idle.</p>
+<p>Event 77191 is an RTC1 interrupt, the last one in that timeline, which then updates the switches to 'off', updates the state and sends out a notification. By showing just API calls and the event you can see all the softdevice calls in the order they are made, all starting with the RTC1 interrupt.</p>
+<p><img src="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/7658.image4.jpg" alt="image description"></p>
+<p>if you zoom out from there looking for the next SWI2 interrupt you can even see there's a couple of bursts of radio activity and then 70ms later the handle value confirm comes in, which the SWI2 interrupt alerts you to.</p>
+<p><img src="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/7242.image5.jpg" alt="image description"></p>
+<p>There's plenty more detail there if you look through the events and this data was all captured, in real time, with the application running and in connection. There is also a post-mortem mode where events are written to a buffer, overwriting as it goes, so if you have an app which fails only occasionally you can leave it running, wait for it to fault and go to a spin error handler or hardfault, and have SystemViewer read the last few things which happened out of the buffer. Since the return value and some of the parameters to the call are logged, you may be able to work out which call failed.</p>
+<p>And here's the code I added ..</p>
+<div class="content-scrollable-wrapper" style="max-width: 100%; overflow: auto; max-height: none;"><pre><code>sysview_all_irq_log( false );
+
+// log the radio, SWI2, our use of RTC1 and SVC calls
+sysview_irq_log( SWI2_IRQn, true );
+sysview_irq_log( RADIO_IRQn, true );
+sysview_irq_log( RTC1_IRQn, true );
+sysview_irq_log( SVCall_IRQn, true );
+
+// and enable it
+sysview_softdevice_enable( true, true );
+</code></pre></div>
+<p>By default all logging is on, which is crazy and I should probably change that, so it disables it all, then just adds back the few items I wanted to see, then it turns on the logging and says it wants the User/Softdevice/Event artificial breakdown.</p>
+<p>sysview_softdevice is a chunk of assembler which does some fairly evil things and then calls out to some C which calls the SEGGER_SYSVIEW logging API commands. Then there's a huge mapping file which maps the event and service numbers in the softdevice to the internal numbers the logging code uses (and which you can see in the .txt file which contains the description).</p>
+<p>Currently this only works for S132 V2.0.0, the release version on nRF52. It would be a little harder to port to nRF51 just because the Cortex-M4F has features which make it easier.</p>
+<p>I've attached a header file and a without-guarantees library. It contains the assembler shim, the logging code and the definitions for S132. It also has the SEGGER_SYSVIEW code and SEGGER_RTT embedded in the library because SYSVIEW wants certain RTT features, so if you link it with something already using RTT, either turn that off or remove the RTT code and use the one in the library.</p>
+<p>Use the functions in the header file to turn it on and off and configure what you log as per the example above just adding it into main() somewhere, add the library to the link path and see if it works. I've tested it only on Crossworks (which is similar to Segger Embedded Studio) and so it's built with gcc, I have no idea how to link it with Keil or IAR, but it's library so it ought to just work.</p>
+<p><a href="https://devzone.nordicsemi.com/cfs-file/__key/communityserver-blogs-components-weblogfiles/00-00-00-00-04-DZ-952/1351.SysviewSoftdevice_5F00_S132V2.a">SysviewSoftdevice_S132V2.a</a></p>
+<p><a href="https://devzone.nordicsemi.com/cfs-file/__key/communityserver-blogs-components-weblogfiles/00-00-00-00-04-DZ-952/2330.sysview_5F00_softdevice.h">sysview_softdevice.h</a></p>
+<p>Cavets:
+It may not work at all, your chip will probably not brick or go on fire, if it does, I'm sorry.</p>
+<p>The code does some fairly intrusive things and tries to hide what it's doing from the softdevice which occasionally figures it out, gets upset and hardfaults on you. The MWU code was particularly tenacious in that respect (!).</p>
+<p>If you go crazy logging stuff you <em>will</em> eventually break the running app, although it manages to keep going an awfully long time (see below).</p>
+<p>Do not use this in production code. It's a debugging tool, the things it does probably invalidates all the softdevice certification, so, not in production.</p>
+<p>Read the Segger SystemView manual and the Segger forums are great if you have questions.</p>
+<p>Or read the Segger api document and put some simple logging in your own code to just log the things you want, it's very easy especially if you do it at the application level, something which SystemView definitely supports.</p>
+<p>This is what it looks like if you log every interrupt and event and then go into connection on the HRM service. The long gap in the middle is where SystemView got confused as the Cortex-M4F cycle counter rolled over. It logged over 11,000 events in about 45 seconds and the app stayed up through all this and was functional despite streams of events separated by microseconds. Somewhere around the minute mark it finally broke .. but I was impressed it managed to send that amount of data for that long whilst still running a bluetooth stack.</p>
+<p><img src="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/1856.image6.jpg" alt="image description"></p>
+<div style="clear:both;"></div></div>
+				</div>
+		</div>
+<div class="content-fragment-footer"></div>
+</div>
+<div class="content-fragment threaded-comments no-wrapper with-spacing responsive-1" id="fragment-167" data-reflow="ctl02_ctl02_content,ctl02_ctl02_singlecolumn,1,1,10">
+<div class="content-fragment-content">
+
+
+
+
+
+	
+	<div class="comment-form">
+	    
+
+
+
+
+
+
+
+<div id="fragment-167_statisticsWrapper" class="comment-statistics">	<ul class="attribute-list">
+<li class="attribute-item count">
+	<span class="value">
+		
+			16 comments
+		
+	</span>
+</li>
+<li class="attribute-item users">
+	<span class="value">
+		
+			0 members are here
+		
+	</span>
+</li>
+</ul>
+
+</div>
+
+		<div class="author" data-authorprofileurl="">
+			<div class="avatar">
+									<img src="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/anonymous.gif-44x44x2.png" border="0px" alt="Anonymous">
+							</div>
+					</div>
+		<fieldset>
+			<ul class="field-list">
+				<li class="field-item post-body">
+					<span class="field-item-input">
+												
+						
+						
+						
+						
+													
+							
+												<div id="mceu_7" class="mce-tinymce mce-container mce-panel mce-editor-submittable mce-editor-desktop mce-editor-blur" hidefocus="1" tabindex="-1" role="application" style="visibility: hidden; border-width: 1px; height: auto; overflow: visible;"><div id="mceu_7-body" class="mce-container-body mce-stack-layout"><div id="mceu_8" class="mce-container mce-menubar mce-toolbar mce-stack-layout-item mce-first" role="menubar" style="border-width: 0px 0px 1px; display: none;"><div id="mceu_8-body" class="mce-container-body mce-flow-layout"><div id="mceu_9" class="mce-widget mce-btn mce-menubtn mce-flow-layout-item mce-first mce-btn-has-text" tabindex="-1" aria-labelledby="mceu_9" role="menuitem" aria-haspopup="true"><button id="mceu_9-open" role="presentation" type="button" tabindex="-1"><span class="mce-txt">Edit</span> <i class="mce-caret"></i></button></div><div id="mceu_10" class="mce-widget mce-btn mce-menubtn mce-flow-layout-item mce-btn-has-text" tabindex="-1" aria-labelledby="mceu_10" role="menuitem" aria-haspopup="true"><button id="mceu_10-open" role="presentation" type="button" tabindex="-1"><span class="mce-txt">Insert</span> <i class="mce-caret"></i></button></div><div id="mceu_11" class="mce-widget mce-btn mce-menubtn mce-flow-layout-item mce-btn-has-text" tabindex="-1" aria-labelledby="mceu_11" role="menuitem" aria-haspopup="true"><button id="mceu_11-open" role="presentation" type="button" tabindex="-1"><span class="mce-txt">Format</span> <i class="mce-caret"></i></button></div><div id="mceu_12" class="mce-widget mce-btn mce-menubtn mce-flow-layout-item mce-last mce-btn-has-text" tabindex="-1" aria-labelledby="mceu_12" role="menuitem" aria-haspopup="true"><button id="mceu_12-open" role="presentation" type="button" tabindex="-1"><span class="mce-txt">Tools</span> <i class="mce-caret"></i></button></div></div></div><div id="mceu_16" class="mce-edit-area mce-container mce-panel mce-stack-layout-item mce-last" hidefocus="1" tabindex="-1" role="group" style="border-width: 0px 0px 1px; position: relative;"><iframe id="fragment-167_fragment-167_createEditor_ifr" frameborder="0" allowtransparency="true" title="Rich Text Area. Press ALT-F9 for menu. Press ALT-F10 for toolbar. Press ALT-0 for help" src="javascript:&quot;&quot;" style="width: 100%; height: 60px; display: block;" src="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/saved_resource.html"></iframe><div class="mce-placeholder" style="display: block;">Leave a comment...</div><div style="position: absolute; top: 0px; left: 0px;"><div class="mceDragDropShade" style="position: absolute; display: none; left: 0px; top: 0px;"></div><div class="mceDragDropMessage" style="position: absolute; display: none; left: 0px; top: 0px;"></div></div></div><div id="mceu_13" class="mce-toolbar-grp mce-container mce-panel mce-stack-layout-item" hidefocus="1" tabindex="-1" role="group"><div id="mceu_13-body" class="mce-container-body mce-stack-layout"><div id="mceu_14" class="mce-container mce-toolbar mce-stack-layout-item mce-first mce-last" role="toolbar"><div id="mceu_14-body" class="mce-container-body mce-flow-layout"><div id="mceu_15" class="mce-container mce-flow-layout-item mce-first mce-last mce-btn-group" role="group" style="width: 100%;"><div id="mceu_15-body" style="white-space: normal;"><div id="mceu_0" class="mce-widget mce-btn mce-menubtn mce-first mce-btn-has-text" tabindex="-1" aria-labelledby="mceu_0" role="button" aria-haspopup="true"><button id="mceu_0-open" role="presentation" type="button" tabindex="-1"><span class="mce-txt">Edit</span> <i class="mce-caret"></i></button></div><div id="mceu_1" class="mce-widget mce-btn mce-menubtn mce-btn-has-text" tabindex="-1" aria-labelledby="mceu_1" role="button" aria-haspopup="true"><button id="mceu_1-open" role="presentation" type="button" tabindex="-1"><span class="mce-txt">Insert</span> <i class="mce-caret"></i></button></div><div id="mceu_2" class="mce-widget mce-btn mce-menubtn mce-btn-has-text" tabindex="-1" aria-labelledby="mceu_2" role="button" aria-haspopup="true"><button id="mceu_2-open" role="presentation" type="button" tabindex="-1"><span class="mce-txt">Format</span> <i class="mce-caret"></i></button></div><div id="mceu_3" class="mce-widget mce-btn mce-menubtn mce-btn-has-text" tabindex="-1" aria-labelledby="mceu_3" role="button" aria-haspopup="true"><button id="mceu_3-open" role="presentation" type="button" tabindex="-1"><span class="mce-txt">Tools</span> <i class="mce-caret"></i></button></div><div id="mceu_4" class="mce-widget mce-btn" tabindex="-1" aria-labelledby="mceu_4" role="button" aria-label="Bullet list"><button role="presentation" type="button" tabindex="-1"><i class="mce-ico mce-i-bullist"></i></button></div><div id="mceu_5" class="mce-widget mce-btn" tabindex="-1" aria-labelledby="mceu_5" role="button" aria-label="Numbered list"><button role="presentation" type="button" tabindex="-1"><i class="mce-ico mce-i-numlist"></i></button></div><div id="mceu_6" class="mce-widget mce-submitpanel mce-last" tabindex="0" role="presentation" aria-haspopup="false"><div id="mceu_6_enable_wrapper" class="mce-submitpanel-message"><input id="mceu_6_enable" type="checkbox" role="presentation" tabindex="-1" class="mce-submitpanel-checked" checked="checked"><label for="mceu_6_enable" tabindex="-1" role="presentation">Enter to Login and Comment</label></div><div class="mce-widget mce-btn mce-primary mce-btn-has-text mce-submitpanel-button" tabindex="-1" id="mceu_6_send" role="button" style="display: none;"><button tabindex="-1" style="width:100%; height:100%;" type="button"><span class="mce-txt">Login and Comment</span></button></div></div></div></div></div></div></div></div></div></div><textarea id="fragment-167_fragment-167_createEditor" name="ctl02$ctl02$w_167$fragment-167_fragment-167_createEditor" style="width: 100%; height: 85px; display: none;" placeholder="Leave a comment..." aria-hidden="true"></textarea><script type="text/javascript" src="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/tinymce.min.js.Без названия"></script><script type="text/javascript" src="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/telligent.tinymce.min.js.Без названия"></script><link rel="stylesheet" type="text/css" href="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/telligent.tinymce.ui.css"><script type="text/javascript" src="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/en-US.js.Без названия"></script><style>
+@font-face {
+	font-family:'tinymce';
+	src:url('https://devzone.nordicsemi.com/tinymce/skins/telligent/fonts//tinymce.eot');
+	src:url('https://devzone.nordicsemi.com/tinymce/skins/telligent/fonts//tinymce.eot?#iefix') format('embedded-opentype'),url('https://devzone.nordicsemi.com/tinymce/skins/telligent/fonts//tinymce.woff') format('woff'),url('https://devzone.nordicsemi.com/tinymce/skins/telligent/fonts//tinymce.ttf') format('truetype'),url('https://devzone.nordicsemi.com/tinymce/skins/telligent/fonts//tinymce.svg#tinymce') format('svg');
+	font-weight:normal;
+	font-style:normal
+}
+@font-face {
+	font-family:'tinymce-small';
+	src:url('https://devzone.nordicsemi.com/tinymce/skins/telligent/fonts//tinymce-small.eot');
+	src:url('https://devzone.nordicsemi.com/tinymce/skins/telligent/fonts//tinymce-small.eot?#iefix') format('embedded-opentype'),url('https://devzone.nordicsemi.com/tinymce/skins/telligent/fonts//tinymce-small.woff') format('woff'),url('https://devzone.nordicsemi.com/tinymce/skins/telligent/fonts//tinymce-small.ttf') format('truetype'),url('https://devzone.nordicsemi.com/tinymce/skins/telligent/fonts//tinymce-small.svg#tinymce') format('svg');
+	font-weight:normal;
+	font-style:normal
+}
+</style>
+<script language="javascript" type="text/javascript">
+// <![CDATA[
+if (!window.tinyMCE_TelligentEvolutionOptions) {
+    tinyMCE_TelligentEvolutionOptions = new Object();
+    tinyMCE_TelligentEvolutionOptions._currentEditor = null;
+    tinyMCE_TelligentEvolutionOptions._contentChangedHandle = null;
+    tinyMCE_TelligentEvolutionOptions.UpdateBookmark = function(editor) {
+	    if (!editor)
+		    editor = tinyMCE.activeEditor;
+
+	    if (!editor)
+		    return;
+
+	    window.clearTimeout(editor._updateBookmarkHandle);
+        editor._updateBookmarkHandle = window.setTimeout(function() { 
+		    if (editor.selection) {
+			    editor._currentBookmark = editor.selection.getBookmark(2);
+		    }
+        }, 99);
+    };
+    tinyMCE_TelligentEvolutionOptions.MoveToBookmark = function(editor) {
+	    if (!editor)
+		    editor = tinyMCE.activeEditor;
+
+	    if (!editor)
+		    return;
+
+	    if (editor._currentBookmark) {
+            try {
+		        editor.selection.moveToBookmark(editor._currentBookmark);
+            } catch (e) { }
+	    } 
+    };
+    tinyMCE_TelligentEvolutionOptions.InitializeContentWindow = function() {
+	    tinyMCE_TelligentEvolutionOptions._currentEditor = tinyMCE.activeEditor;
+	    tinyMCE_TelligentEvolutionOptions.UpdateBookmark();
+    };
+    tinyMCE_TelligentEvolutionOptions.InsertContent = function(content, editor) {
+	    if (!editor)
+		    editor = tinyMCE.activeEditor;
+
+	    if (!editor)
+		    return;
+
+        try {
+	        tinyMCE_TelligentEvolutionOptions.MoveToBookmark(editor);
+            editor.execCommand('mceInsertContent', false, content)
+        } catch(e) {}
+    };
+    tinyMCE_TelligentEvolutionOptions.SetContent = function(content, editor) {
+	    if (!editor)
+		    editor = tinyMCE.activeEditor;
+
+	    if (!editor)
+		    return;
+
+        try {
+            editor.execCommand('mceSetContent', false, content)
+        } catch (e) {}
+    };
+    tinyMCE_TelligentEvolutionOptions.Setup = function(ed) {
+        if (window.$) { try { $(document).bind('beforecustomizepage', function() { if (ed) { ed.remove(); } }); } catch (e) { } }
+        ed.on('NodeChange', function() {
+		    tinyMCE_TelligentEvolutionOptions.UpdateBookmark();
+            window.clearTimeout(ed._contentChangedHandle);
+            ed._contentChangedHandle = window.setTimeout(function() { 
+                if(tinyMCE.activeEditor === ed) {
+                    tinyMCE_TelligentEvolutionOptions.ContentChanged(ed); 
+                }
+            }, 999);
+        });
+        ed.on('change SetContent', function() {
+		    tinyMCE_TelligentEvolutionOptions.UpdateBookmark();
+            window.clearTimeout(ed._contentChangedHandle);
+            ed._contentChangedHandle = window.setTimeout(function() { 
+			    try {
+				    tinyMCE_TelligentEvolutionOptions.ContentChanged(ed); 
+			    } catch(e) { }
+		    }, 999);
+        });
+	    ed.on('keydown', function (e) {
+		    if (ed._tinyMCE_TelligentEvolutionOptions_onKeyDownHandlers) {
+			    for (var i = 0; i < ed._tinyMCE_TelligentEvolutionOptions_onKeyDownHandlers.length; i++) {
+				    var response = ed._tinyMCE_TelligentEvolutionOptions_onKeyDownHandlers[i](e);
+				    if (response === false) {
+					    return false;
+				    }
+			    }
+		    }
+        }, true);
+        ed.on('LoadContent', function() { 
+		    ed._oldContentValue = ed.getContent(); 
+		    if (ed._oldContentValue == '<p>&nbsp;</p>') { 
+			    ed._oldContentValue = ''; 
+		    } 
+		    try {
+			    ed.getWin().document.addEventListener('keydown', function() { ed.getWin().focus(); });
+		    } catch (e) {}
+	    });
+	
+    }
+    tinyMCE_TelligentEvolutionOptions.ContentChanged = function(ed) {
+        ed.save();
+
+        var oldContent = ed._oldContentValue;
+        ed._oldContentValue = ed.getContent();
+    
+        if (ed._oldContentValue == '<p>&nbsp;</p>')
+            ed._oldContentValue = '';
+
+        if (oldContent == ed._oldContentValue)
+            return;
+
+        if (ed._tinyMCE_TelligentEvolutionOptions_onChangeHandlers) {
+            for (var i = 0; i < ed._tinyMCE_TelligentEvolutionOptions_onChangeHandlers.length; i++) {
+                ed._tinyMCE_TelligentEvolutionOptions_onChangeHandlers[i]();
+            }
+        }
+    }
+    tinyMCE_TelligentEvolutionOptions.GetBaseUrl = function() {
+        try { 
+            if (window.parent && window.parent.Telligent_Modal)
+                return window.parent.location + ""; 
+        } 
+        catch (e) {} 
+
+        return window.location + "";
+    };
+    tinyMCE_TelligentEvolutionOptions.AttachOnChangeHandler = function(id, f) {
+        var ed = tinyMCE.get(id);
+        if (ed) {
+            if (!ed._tinyMCE_TelligentEvolutionOptions_onChangeHandlers)
+                ed._tinyMCE_TelligentEvolutionOptions_onChangeHandlers = new Array();
+
+            ed._tinyMCE_TelligentEvolutionOptions_onChangeHandlers[ed._tinyMCE_TelligentEvolutionOptions_onChangeHandlers.length] = f;
+            return;
+        }
+
+        window.setTimeout(function() { tinyMCE_TelligentEvolutionOptions.AttachOnChangeHandler(id, f) }, 499);
+    }
+    tinyMCE_TelligentEvolutionOptions.AttachOnKeyDownHandler = function(id, f) {
+	    var ed = tinyMCE.get(id);
+        if (ed) {
+            if (!ed._tinyMCE_TelligentEvolutionOptions_onKeyDownHandlers)
+                ed._tinyMCE_TelligentEvolutionOptions_onKeyDownHandlers = new Array();
+
+            ed._tinyMCE_TelligentEvolutionOptions_onKeyDownHandlers[ed._tinyMCE_TelligentEvolutionOptions_onKeyDownHandlers.length] = f;
+            return;
+        }
+
+        window.setTimeout(function() { tinyMCE_TelligentEvolutionOptions.AttachOnKeyDownHandler(id, f) }, 499);
+    }
+    tinyMCE_TelligentEvolutionOptions.ContextQueryString = '_pcurl=~%2Fnordic%2Fnordic-blog%2Fb%2Fblog%2Fposts%2Finstrumenting-with-segger-systemview%3FCommentId%3D65e44d50-75c4-4359-87bc-2313f8368a2d';
+    tinyMCE_TelligentEvolutionOptions.DirectUploadContext = '08a8a2fd-e037-4185-a8d3-302f5fe05ae6';
+    tinyMCE_TelligentEvolutionOptions.DirectUploadUrl = '\/multipleupload?UploadContext=08a8a2fd-e037-4185-a8d3-302f5fe05ae6';
+    tinyMCE_TelligentEvolutionOptions.MediaMaxWidth = 1040;
+    tinyMCE_TelligentEvolutionOptions.MediaMaxHeight = 0;
+}
+// ]]>
+</script>
+<script language="javascript" type="text/javascript">
+// <![CDATA[
+tinymce.EditorManager.baseURL = "/tinymce";
+(function() {
+    var editor = tinymce.EditorManager.get('fragment-167_fragment-167_createEditor');
+    if (editor) {
+        editor.remove();
+    }
+})();
+tinymce.EditorManager.init({
+    selector:"#fragment-167_fragment-167_createEditor",
+    relative_urls:false,
+    setup:new Function('ed', 'tinyMCE_TelligentEvolutionOptions.Setup(ed);'),
+    tinyautosave_key:'2137561785-',
+    evolution_contenttypeid:'9262536b-49a3-4494-802f-04dff10424ed',
+    theme: 'modern',
+    skin: 'telligent',
+    resize: 'true',
+	object_resizing: 'table,img,.mceInsertMediaItem',
+    language: 'en-US',
+    plugins: 'charmap,source,contextmenu,noneditable,fullscreen,hr,paste,searchreplace,visualblocks,visualchars,enhancements,modalpopups,tips,emoticons,embeddables,quotes,anchor,autolink,link,autoresize,lists,hashtags,mentions,media,preview,tinyautosave,submit,bottomtoolbar',submit_enabletoggle: true,menu: { 
+    edit   : {title : 'Edit'  , items : 'removehashtag removemention editmedia editimage removemedia editembeddable edittoken removetoken editlink previewmedia removelink undo redo | pastetext searchreplace | selectall'},
+    insert : {title : 'Insert', items : 'link media token embedb99cc4af-f990-4d68-b98f-dd11f41cb350 embeddc8ab71f-3b98-42d9-b0f6-e21e02a0f8e2 emoticon | anchor hr | charmap'},
+    format : {title : 'Format', items : 'bold italic underline | indent outdent |formats | removeformat'},
+    tools  : {title : 'Tools' , items : 'tinyautosave preview source'}
+},statusbar: false,
+    fontsize_formats: 'Small=75% Normal=inherit Large=150% Larger=200%',
+    font_formats: 'Arial=arial,helvetica,sans-serif;Comic Sans=comic sans ms,comic sans,sans-serif;Courier New=courier new,courier;Default Font=inherit;Georgia=georgia,palatino;Helvetica=helvetica;Impact=impact,chicago;Tahoma=tahoma,arial,helvetica,sans-serif;Times New Roman=times new roman,times;Verdana=verdana,geneva',
+	evolution_emoticons: true,
+	evolution_upload:false,
+	evolution_localfiles:true,
+enhancements_placeholder: 'Leave a comment...',autoresize_bottom_margin: 1,autoresize_overflow_padding: 0,autoresize_min_height: 60,height: 85,min_height: 60,enhancements_wrappercss:'mce-editor-submittable mce-editor-desktop',toolbar: 'bullist numlist submit',contextmenu: 'cell row column deletetable',evolution_embeddables: [{"name":"Embed Code","typeid":"b99cc4af-f990-4d68-b98f-dd11f41cb350","previewUrl":"/cfs-file/__key/system/images/embedcode.png","configurable":true},{"name":"Code","typeid":"dc8ab71f-3b98-42d9-b0f6-e21e02a0f8e2","previewUrl":"/cfs-file/__key/system/images/embedcode.png","configurable":true}],browser_spellcheck : true,autolink_pattern: /((?:http|ftp|https):\/\/)([\w\-]{1,63}(?:\.[\w\-]{1,63}){0,127}(?:\([\w\-\.,@?!^=%&:/~\+#]{0,2046}\)|[\w\-\.,@?!^=%&:/~\+#]{0,2047}[\w\-@?^=%&:/~\+#]){0,2048})/i,paste_data_images: true,submit_entermessage:'Enter to Login and Comment',submit_buttontext:'Login and Comment',submit_onsubmit:function() { jQuery.telligent.evolution.messaging.publish('widgets.comments.submit', { from: 'fragment-167',  login: true  }); },submit_entertosubmit: true,
+    document_base_url: tinyMCE_TelligentEvolutionOptions.GetBaseUrl(),
+	images_dataimg_filter: function() { return false; },
+    anchor_bottom: false,
+    anchor_top: false,
+    content_css: 'https:\/\/devzone.nordicsemi.com\/tinymce\/telligent\/telligent.tinymce.content.css',style_formats:[{
+			title: 'Inline', items: [
+					{ title: 'Bold', icon: 'bold', format: 'bold'},
+					{ title: 'Italic', icon: 'italic', format: 'italic'},
+					{ title: 'Underline', icon: 'underline', format: 'underline'},
+					{ title: 'Strikethrough', icon: 'strikethrough', format: 'strikethrough'},
+				{ title: 'Superscript', icon: 'superscript', format: 'superscript'},
+				{ title: 'Subscript', icon: 'subscript', format: 'subscript'},]}, {
+				title: 'Blocks', items: [
+					{ title: 'Paragraph', format: 'p'},
+					{ title: 'Blockquote', format: 'blockquote'},
+					{ title: 'Div', format: 'div'},
+					{ title: 'Pre', format: 'pre'}
+				]},
+				{
+				title: 'Alignment', items: [
+					{ title: 'Left', icon: 'alignleft', format: 'alignleft'},
+					{ title: 'Center', icon: 'aligncenter', format: 'aligncenter'},
+					{ title: 'Right', icon: 'alignright', format: 'alignright'},
+					{ title: 'Justify', icon: 'alignjustify', format: 'alignjustify'}
+				]}],valid_elements:'@[class|style|align|id|dir|lang|title],a[charset|href|hreflang|name|rel|rev|target|type],b,bdo,blockquote[cite],br[clear],dd,div,dl,dt,em,i,img[alt|border|height|hspace|longdesc|name|src|vspace|width],li,meta[charset|content|name|scheme],meter[max|min|value|high|low|optimum],ol[start|reversed],p,pre,progress[value|max],s,span,strike,strong,sub,sup,tt,u,ul',valid_styles: {'*':'clear,float,font-style,font-weight,text-align,text-decoration,text-indent,vertical-align'},protect:[/\<\!\-\-.*?\-\-\>/g,/\<\!\[CDATA\[.*?\]\]\>/g],
+    directionality: 'ltr'
+});
+// ]]>
+</script>
+					</span>
+					<span class="field-item-validation" style="display: none;"></span>
+					<span class="processing"><span class="ui-loading" data-width="45" data-height="15" style="display: block; width: 45px; height: 15px; margin: 0px auto; padding: 0px; text-align: center; box-sizing: border-box;"><div class="spinner"><div class="bounce1" style="width:15px;height:15px;background-color:rgb(17, 23, 26);"></div><div class="bounce2" style="width:15px;height:15px;background-color:rgb(17, 23, 26);"></div><div class="bounce3" style="width:15px;height:15px;background-color:rgb(17, 23, 26);"></div></div></span></span>
+				</li>
+			</ul>
+		</fieldset>
+	</div>
+
+	
+
+	<div class="best-replies-wrapper" id="fragment-167_bestRepliesWrapper">
+		
+	</div>
+
+
+
+<div class="threaded-wrapper-outer">
+	<div class="typing-status-wrapper root"></div>
+	<div class="threaded-wrapper" id="fragment-167_preRenderedWrapperId" style="display: block;"><div class="reply-header">	<div class="threaded-filter" id="fragment-167_filter">
+	<ul class="filter order margin-bottom margin-top">
+		<li class="filter-option" data-sortby="CreatedDate" data-sortorder="Ascending">
+			<a class="navigable" href="https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/posts/instrumenting-with-segger-systemview?CommentSortBy=CreatedDate&amp;CommentSortOrder=Ascending">Oldest</a>
+		</li>
+					<li class="filter-option selected" data-sortby="Votes" data-sortorder="Descending">
+				<a class="navigable" href="https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/posts/instrumenting-with-segger-systemview?CommentSortBy=Votes&amp;CommentSortOrder=Descending">Best</a>
+			</li>
+				<li class="filter-option" data-sortby="CreatedDate" data-sortorder="Descending">
+			<a class="navigable" href="https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/posts/instrumenting-with-segger-systemview?CommentSortBy=CreatedDate&amp;CommentSortOrder=Descending">Newest</a>
+		</li>
+	</ul>
+</div>
+
+</div><ul class="content-list threaded" data-sortby="Votes" data-sortorder="Descending"><li class="threaded content-item " data-id="c8c4bdb6-e9cd-4dc5-a970-89f0bace5e95" data-parentid="null" data-createddate="2016-06-09T12:29:02.0000000Z" data-yesvotes="0" data-novotes="0">
+
+	<div class="rendered-content">
+		
+
+<div class="author" data-authorprofileurl="/members/adrian">
+	<div class="avatar">
+					<a href="https://devzone.nordicsemi.com/members/adrian" class="internal-link view-user-profile">
+				<img src="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/anonymous.gif-44x44x2.png" border="0px" alt="Adrian Eggenberger">
+			</a>
+			</div>
+	<div class="meta">
+		<span class="user-name">
+			<span class="ui-userpresence ui-tip " style="display: none;" data-userid="2740" data-contentid="f63de358-5f11-47ef-a4c5-cf2b0b4a36cd" data-contenttypeid="e9ed4118-60ed-4f2b-a026-5705b8793d05" data-present="" data-presentlabel="Online" data-notpresentlabel="Offline" data-tip=""></span>
+											<a href="https://devzone.nordicsemi.com/members/adrian" class="internal-link view-user-profile">
+					Adrian Eggenberger
+				</a>
+					</span>
+		<a href="https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/posts/instrumenting-with-segger-systemview?CommentId=c8c4bdb6-e9cd-4dc5-a970-89f0bace5e95" class="internal-link view-post navigable">
+			<span class="ui-agodate ui-tip " data-tip="9 Jun 2016 12:29" data-dateutc="2016-06-09T12:29:02.000Z">over 4 years ago</span>
+		</a>
+			</div>
+</div>
+<div class="content full threaded-reply-content user-defined-markup">
+			<div class="content"><p>Impressive work!</p>
+<div style="clear:both;"></div></div>
+	</div>
+<div class="edit-form"></div>
+<div class="actions meta edit">
+	<div class="navigation-list" data-maxlinks="1" data-direction="horizontal" data-reflow-wait-check-count="0" data-reflow-wait-timeout="null"></div>
+</div>
+<div class="actions meta default">
+		 		 		<div class="navigation-list" data-maxlinks="3" data-direction="horizontal" data-reflow-wait-check-count="0" data-reflow-wait-timeout="null"></div>
+</div>
+
+		<div class="typing-status-wrapper"></div>
+		<div class="new-replies-wrapper"></div>
+	</div>
+
+	<div class="newreply"></div>
+
+	<ul class="content-list threaded" data-sortby="Votes" data-sortorder="Descending"></ul>
+
+</li><li class="threaded content-item " data-id="8d3d98bb-8d77-4c89-b5a3-d1b31bdebb51" data-parentid="null" data-createddate="2016-06-10T05:20:15.0000000Z" data-yesvotes="0" data-novotes="0">
+
+	<div class="rendered-content">
+		
+
+<div class="author" data-authorprofileurl="/members/dbeckwith">
+	<div class="avatar">
+					<a href="https://devzone.nordicsemi.com/members/dbeckwith" class="internal-link view-user-profile">
+				<img src="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/4U8VTOFJ1KEK.jpg-44x44x2.jpg" border="0px" alt="WestCoastDaz">
+			</a>
+			</div>
+	<div class="meta">
+		<span class="user-name">
+			<span class="ui-userpresence ui-tip " style="display: none;" data-userid="6058" data-contentid="8716f5d7-ffd0-42f2-8dbd-71e9125db2d6" data-contenttypeid="e9ed4118-60ed-4f2b-a026-5705b8793d05" data-present="" data-presentlabel="Online" data-notpresentlabel="Offline" data-tip=""></span>
+											<a href="https://devzone.nordicsemi.com/members/dbeckwith" class="internal-link view-user-profile">
+					WestCoastDaz
+				</a>
+					</span>
+		<a href="https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/posts/instrumenting-with-segger-systemview?CommentId=8d3d98bb-8d77-4c89-b5a3-d1b31bdebb51" class="internal-link view-post navigable">
+			<span class="ui-agodate ui-tip " data-tip="10 Jun 2016 05:20" data-dateutc="2016-06-10T05:20:15.000Z">over 4 years ago</span>
+		</a>
+			</div>
+</div>
+<div class="content full threaded-reply-content user-defined-markup">
+			<div class="content"><p>RK,</p>
+<p>This is really impressive.  I was actually looking at FreeRTOS+Trace to do some better debugging but I like this more since it doesn't require a license.  Do you still need the assembly shim if you are planning on instrumenting application level code?</p>
+<p>Thanks,
+Darren</p>
+<div style="clear:both;"></div></div>
+	</div>
+<div class="edit-form"></div>
+<div class="actions meta edit">
+	<div class="navigation-list" data-maxlinks="1" data-direction="horizontal" data-reflow-wait-check-count="0" data-reflow-wait-timeout="null"></div>
+</div>
+<div class="actions meta default">
+		 		 		<div class="navigation-list" data-maxlinks="3" data-direction="horizontal" data-reflow-wait-check-count="0" data-reflow-wait-timeout="null"></div>
+</div>
+
+		<div class="typing-status-wrapper"></div>
+		<div class="new-replies-wrapper"></div>
+	</div>
+
+	<div class="newreply"></div>
+
+	<ul class="content-list threaded" data-sortby="Votes" data-sortorder="Descending"></ul>
+
+</li><li class="threaded content-item " data-id="785e4d83-542d-4812-99be-7ddd334f0cd4" data-parentid="null" data-createddate="2016-06-10T05:29:32.0000000Z" data-yesvotes="0" data-novotes="0">
+
+	<div class="rendered-content">
+		
+
+<div class="author" data-authorprofileurl="/members/rols">
+	<div class="avatar">
+					<a href="https://devzone.nordicsemi.com/members/rols" class="internal-link view-user-profile">
+				<img src="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/anonymous.gif-44x44x2.png" border="0px" alt="RK">
+			</a>
+			</div>
+	<div class="meta">
+		<span class="user-name">
+			<span class="ui-userpresence ui-tip " style="display: none;" data-userid="2867" data-contentid="b120e916-11f4-4d69-9860-d3aec240c07d" data-contenttypeid="e9ed4118-60ed-4f2b-a026-5705b8793d05" data-present="" data-presentlabel="Online" data-notpresentlabel="Offline" data-tip=""></span>
+											<a href="https://devzone.nordicsemi.com/members/rols" class="internal-link view-user-profile">
+					RK
+				</a>
+					</span>
+		<a href="https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/posts/instrumenting-with-segger-systemview?CommentId=785e4d83-542d-4812-99be-7ddd334f0cd4" class="internal-link view-post navigable">
+			<span class="ui-agodate ui-tip " data-tip="10 Jun 2016 05:29" data-dateutc="2016-06-10T05:29:32.000Z">over 4 years ago</span>
+		</a>
+			</div>
+</div>
+<div class="content full threaded-reply-content user-defined-markup">
+			<div class="content"><p>No if you're instrumenting app-level code no need for any assembler, just compile the SYSVIEW and RTT sources, include the header and call the SEGGER_SYSVIEW_Record ... () functions. The event id goes in your mapping txt file so you can map to an API call. You can get fancy and call task start and other stuff but if you just want a list of called functions, that's enough. You have a choice whether to start with their NoOS example which is a OS-style instrumentation or use the 'module' instrumentation one. They're both in the manual, I'd use the noOS one myself, gives you more flexibility.</p>
+<p>The assembler is only there to intercept all the IRQs and SVC calls as it has to do a load of stack and LR manipulation to interpose itself before and after the softdevice handlers whilst appearing not to be there at all. So API level, no need for that.</p>
+<div style="clear:both;"></div></div>
+	</div>
+<div class="edit-form"></div>
+<div class="actions meta edit">
+	<div class="navigation-list" data-maxlinks="1" data-direction="horizontal" data-reflow-wait-check-count="0" data-reflow-wait-timeout="null"></div>
+</div>
+<div class="actions meta default">
+		 		 		<div class="navigation-list" data-maxlinks="3" data-direction="horizontal" data-reflow-wait-check-count="0" data-reflow-wait-timeout="null"></div>
+</div>
+
+		<div class="typing-status-wrapper"></div>
+		<div class="new-replies-wrapper"></div>
+	</div>
+
+	<div class="newreply"></div>
+
+	<ul class="content-list threaded" data-sortby="Votes" data-sortorder="Descending"><li class="threaded content-item " data-id="46c097ff-979c-4b5d-bda6-558c0cb6b95c" data-parentid="785e4d83-542d-4812-99be-7ddd334f0cd4" data-createddate="2019-03-04T17:06:35.6430000Z" data-yesvotes="0" data-novotes="0">
+
+	<div class="rendered-content">
+		
+
+<div class="author" data-authorprofileurl="/members/eblot">
+	<div class="avatar">
+					<a href="https://devzone.nordicsemi.com/members/eblot" class="internal-link view-user-profile">
+				<img src="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/4U9WOG0PB6MQ.jpg-44x44x2.jpg" border="0px" alt="Emmanuel Blot">
+			</a>
+			</div>
+	<div class="meta">
+		<span class="user-name">
+			<span class="ui-userpresence ui-tip " style="display: none;" data-userid="22723" data-contentid="36579969-66ed-4014-9601-bd1419b0fa91" data-contenttypeid="e9ed4118-60ed-4f2b-a026-5705b8793d05" data-present="" data-presentlabel="Online" data-notpresentlabel="Offline" data-tip=""></span>
+											<a href="https://devzone.nordicsemi.com/members/eblot" class="internal-link view-user-profile">
+					Emmanuel Blot
+				</a>
+					</span>
+		<a href="https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/posts/instrumenting-with-segger-systemview?CommentId=46c097ff-979c-4b5d-bda6-558c0cb6b95c" class="internal-link view-post navigable">
+			<span class="ui-agodate ui-tip " data-tip="4 Mar 2019 17:06" data-dateutc="2019-03-04T17:06:35.643Z">over 1 year ago</span>
+		</a>
+									<span class="parent">
+					in reply to <a class="internal-link view-post navigable ui-tip" data-tip="View Parent Reply" href="https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/posts/instrumenting-with-segger-systemview?CommentId=785e4d83-542d-4812-99be-7ddd334f0cd4">RK</a><a></a>
+				</span>
+						</div>
+</div>
+<div class="content full threaded-reply-content user-defined-markup">
+			<div class="content"><p>Hi,</p><div style="clear:both;"></div></div>
+	</div>
+<div class="edit-form"></div>
+<div class="actions meta edit">
+	<div class="navigation-list" data-maxlinks="1" data-direction="horizontal" data-reflow-wait-check-count="0" data-reflow-wait-timeout="null"></div>
+</div>
+<div class="actions meta default">
+		 		 		<div class="navigation-list" data-maxlinks="3" data-direction="horizontal" data-reflow-wait-check-count="0" data-reflow-wait-timeout="null"></div>
+</div>
+
+		<div class="typing-status-wrapper"></div>
+		<div class="new-replies-wrapper"></div>
+	</div>
+
+	<div class="newreply"></div>
+
+	<ul class="content-list threaded" data-sortby="Votes" data-sortorder="Descending"></ul>
+
+</li><li class="threaded content-item " data-id="158fa3cf-47c4-41d3-b037-6f09a0568104" data-parentid="785e4d83-542d-4812-99be-7ddd334f0cd4" data-createddate="2019-03-04T17:10:25.7500000Z" data-yesvotes="0" data-novotes="0">
+
+	<div class="rendered-content">
+		
+
+<div class="author" data-authorprofileurl="/members/eblot">
+	<div class="avatar">
+					<a href="https://devzone.nordicsemi.com/members/eblot" class="internal-link view-user-profile">
+				<img src="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/4U9WOG0PB6MQ.jpg-44x44x2.jpg" border="0px" alt="Emmanuel Blot">
+			</a>
+			</div>
+	<div class="meta">
+		<span class="user-name">
+			<span class="ui-userpresence ui-tip " style="display: none;" data-userid="22723" data-contentid="36579969-66ed-4014-9601-bd1419b0fa91" data-contenttypeid="e9ed4118-60ed-4f2b-a026-5705b8793d05" data-present="" data-presentlabel="Online" data-notpresentlabel="Offline" data-tip=""></span>
+											<a href="https://devzone.nordicsemi.com/members/eblot" class="internal-link view-user-profile">
+					Emmanuel Blot
+				</a>
+					</span>
+		<a href="https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/posts/instrumenting-with-segger-systemview?CommentId=158fa3cf-47c4-41d3-b037-6f09a0568104" class="internal-link view-post navigable">
+			<span class="ui-agodate ui-tip " data-tip="4 Mar 2019 17:10" data-dateutc="2019-03-04T17:10:25.750Z">over 1 year ago</span>
+		</a>
+									<span class="parent">
+					in reply to <a class="internal-link view-post navigable ui-tip" data-tip="View Parent Reply" href="https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/posts/instrumenting-with-segger-systemview?CommentId=785e4d83-542d-4812-99be-7ddd334f0cd4">RK</a><a></a>
+				</span>
+						</div>
+</div>
+<div class="content full threaded-reply-content user-defined-markup">
+			<div class="content"><p>Hi,&nbsp;</p>
+<p>Any chance to revive this thread? I do not mind if the code is incomplete or not documented. S132 has evolved quite a bit since this original post. Thanks !</p><div style="clear:both;"></div></div>
+	</div>
+<div class="edit-form"></div>
+<div class="actions meta edit">
+	<div class="navigation-list" data-maxlinks="1" data-direction="horizontal" data-reflow-wait-check-count="0" data-reflow-wait-timeout="null"></div>
+</div>
+<div class="actions meta default">
+		 		 		<div class="navigation-list" data-maxlinks="3" data-direction="horizontal" data-reflow-wait-check-count="0" data-reflow-wait-timeout="null"></div>
+</div>
+
+		<div class="typing-status-wrapper"></div>
+		<div class="new-replies-wrapper"></div>
+	</div>
+
+	<div class="newreply"></div>
+
+	<ul class="content-list threaded" data-sortby="Votes" data-sortorder="Descending"></ul>
+
+</li></ul>
+
+</li><li class="threaded content-item  permalinked" data-id="65e44d50-75c4-4359-87bc-2313f8368a2d" data-parentid="null" data-createddate="2016-06-11T05:43:46.0000000Z" data-yesvotes="0" data-novotes="0">
+
+	<div class="rendered-content">
+		
+
+<div class="author" data-authorprofileurl="/members/dbeckwith">
+	<div class="avatar">
+					<a href="https://devzone.nordicsemi.com/members/dbeckwith" class="internal-link view-user-profile">
+				<img src="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/4U8VTOFJ1KEK.jpg-44x44x2.jpg" border="0px" alt="WestCoastDaz">
+			</a>
+			</div>
+	<div class="meta">
+		<span class="user-name">
+			<span class="ui-userpresence ui-tip " style="display: none;" data-userid="6058" data-contentid="8716f5d7-ffd0-42f2-8dbd-71e9125db2d6" data-contenttypeid="e9ed4118-60ed-4f2b-a026-5705b8793d05" data-present="" data-presentlabel="Online" data-notpresentlabel="Offline" data-tip=""></span>
+											<a href="https://devzone.nordicsemi.com/members/dbeckwith" class="internal-link view-user-profile">
+					WestCoastDaz
+				</a>
+					</span>
+		<a href="https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/posts/instrumenting-with-segger-systemview?CommentId=65e44d50-75c4-4359-87bc-2313f8368a2d" class="internal-link view-post navigable">
+			<span class="ui-agodate ui-tip " data-tip="11 Jun 2016 05:43" data-dateutc="2016-06-11T05:43:46.000Z">over 4 years ago</span>
+		</a>
+			</div>
+</div>
+<div class="content full threaded-reply-content user-defined-markup">
+			<div class="content"><p>RK,</p>
+<p>Thanks for the inspiration!  I have added this to my project and it is working great.  I was considering investing in FreeRTOS+Trace but this is free and has almost exactly the same functionality minus the many views that come with FreeRTOS+Trace.</p>
+<p>Cheers,
+Darren</p>
+<div style="clear:both;"></div></div>
+	</div>
+<div class="edit-form"></div>
+<div class="actions meta edit">
+	<div class="navigation-list" data-maxlinks="1" data-direction="horizontal" data-reflow-wait-check-count="0" data-reflow-wait-timeout="null"></div>
+</div>
+<div class="actions meta default">
+		 		 		<div class="navigation-list" data-maxlinks="3" data-direction="horizontal" data-reflow-wait-check-count="0" data-reflow-wait-timeout="null"></div>
+</div>
+
+		<div class="typing-status-wrapper"></div>
+		<div class="new-replies-wrapper"></div>
+	</div>
+
+	<div class="newreply"></div>
+
+	<ul class="content-list threaded" data-sortby="Votes" data-sortorder="Descending"></ul>
+
+</li><li class="threaded content-item " data-id="d5f002de-c597-423c-a4b4-cac334bd4219" data-parentid="null" data-createddate="2016-06-22T01:04:29.0000000Z" data-yesvotes="0" data-novotes="0">
+
+	<div class="rendered-content">
+		
+
+<div class="author" data-authorprofileurl="/members/wslkh">
+	<div class="avatar">
+					<a href="https://devzone.nordicsemi.com/members/wslkh" class="internal-link view-user-profile">
+				<img src="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/anonymous.gif-44x44x2.png" border="0px" alt="wslkh">
+			</a>
+			</div>
+	<div class="meta">
+		<span class="user-name">
+			<span class="ui-userpresence ui-tip " style="display: none;" data-userid="14340" data-contentid="513ae9d7-557b-425a-a58c-41f8f2a6500e" data-contenttypeid="e9ed4118-60ed-4f2b-a026-5705b8793d05" data-present="" data-presentlabel="Online" data-notpresentlabel="Offline" data-tip=""></span>
+											<a href="https://devzone.nordicsemi.com/members/wslkh" class="internal-link view-user-profile">
+					wslkh
+				</a>
+					</span>
+		<a href="https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/posts/instrumenting-with-segger-systemview?CommentId=d5f002de-c597-423c-a4b4-cac334bd4219" class="internal-link view-post navigable">
+			<span class="ui-agodate ui-tip " data-tip="22 Jun 2016 01:04" data-dateutc="2016-06-22T01:04:29.000Z">over 4 years ago</span>
+		</a>
+			</div>
+</div>
+<div class="content full threaded-reply-content user-defined-markup">
+			<div class="content"><p>Really love the tool by looking into its features. Hope Nordic could give some official examples ASAP in the SDK, or github. Could not wait to use it.</p>
+<div style="clear:both;"></div></div>
+	</div>
+<div class="edit-form"></div>
+<div class="actions meta edit">
+	<div class="navigation-list" data-maxlinks="1" data-direction="horizontal" data-reflow-wait-check-count="0" data-reflow-wait-timeout="null"></div>
+</div>
+<div class="actions meta default">
+		 		 		<div class="navigation-list" data-maxlinks="3" data-direction="horizontal" data-reflow-wait-check-count="0" data-reflow-wait-timeout="null"></div>
+</div>
+
+		<div class="typing-status-wrapper"></div>
+		<div class="new-replies-wrapper"></div>
+	</div>
+
+	<div class="newreply"></div>
+
+	<ul class="content-list threaded" data-sortby="Votes" data-sortorder="Descending"></ul>
+
+</li><li class="load-more  next ">
+	
+		<a class="next" href="https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/posts/instrumenting-with-segger-systemview?CommentId=65e44d50-75c4-4359-87bc-2313f8368a2d#">Load Next </a>
+	
+	<span class="ui-loading" data-width="24" data-height="24" style="display: block; width: 24px; height: 24px; margin: 0px auto; padding: 8px 0px; text-align: center; box-sizing: border-box;"><div class="spinner"><div class="bounce1" style="width:8px;height:8px;background-color:rgb(17, 23, 26);"></div><div class="bounce2" style="width:8px;height:8px;background-color:rgb(17, 23, 26);"></div><div class="bounce3" style="width:8px;height:8px;background-color:rgb(17, 23, 26);"></div></div></span>
+</li></ul></div>
+</div>
+
+<div id="fragment-167_editorWrapperWrapper" style="display:none">
+		
+	
+	
+	
+	
+	
+	
+<script language="javascript" type="text/javascript">
+// <![CDATA[
+tinymce.EditorManager.baseURL = "/tinymce";
+(function() {
+    var editor = tinymce.EditorManager.get('fragment-167_fragment-167_replyEditor');
+    if (editor) {
+        editor.remove();
+    }
+})();
+tinymce.EditorManager.init({
+    selector:"#fragment-167_fragment-167_replyEditor",
+    relative_urls:false,
+    setup:new Function('ed', 'tinyMCE_TelligentEvolutionOptions.Setup(ed);'),
+    tinyautosave_key:'1823614909-',
+    evolution_contenttypeid:'9262536b-49a3-4494-802f-04dff10424ed',
+    theme: 'modern',
+    skin: 'telligent',
+    resize: 'true',
+	object_resizing: 'table,img,.mceInsertMediaItem',
+    language: 'en-US',
+    plugins: 'charmap,source,contextmenu,noneditable,fullscreen,hr,paste,searchreplace,visualblocks,visualchars,enhancements,modalpopups,tips,emoticons,embeddables,quotes,anchor,autolink,link,autoresize,lists,hashtags,mentions,media,preview,tinyautosave,submit,bottomtoolbar',submit_enabletoggle: true,menu: { 
+    edit   : {title : 'Edit'  , items : 'removehashtag removemention editmedia editimage removemedia editembeddable edittoken removetoken editlink previewmedia removelink undo redo | pastetext searchreplace | selectall'},
+    insert : {title : 'Insert', items : 'link media token embedb99cc4af-f990-4d68-b98f-dd11f41cb350 embeddc8ab71f-3b98-42d9-b0f6-e21e02a0f8e2 emoticon | anchor hr | charmap'},
+    format : {title : 'Format', items : 'bold italic underline | indent outdent |formats | removeformat'},
+    tools  : {title : 'Tools' , items : 'tinyautosave preview source'}
+},statusbar: false,
+    fontsize_formats: 'Small=75% Normal=inherit Large=150% Larger=200%',
+    font_formats: 'Arial=arial,helvetica,sans-serif;Comic Sans=comic sans ms,comic sans,sans-serif;Courier New=courier new,courier;Default Font=inherit;Georgia=georgia,palatino;Helvetica=helvetica;Impact=impact,chicago;Tahoma=tahoma,arial,helvetica,sans-serif;Times New Roman=times new roman,times;Verdana=verdana,geneva',
+	evolution_emoticons: true,
+	evolution_upload:false,
+	evolution_localfiles:true,
+autoresize_bottom_margin: 1,autoresize_overflow_padding: 0,autoresize_min_height: 60,height: 85,min_height: 60,enhancements_wrappercss:'mce-editor-submittable mce-editor-desktop',toolbar: 'bullist numlist submit',contextmenu: 'cell row column deletetable',evolution_embeddables: [{"name":"Embed Code","typeid":"b99cc4af-f990-4d68-b98f-dd11f41cb350","previewUrl":"/cfs-file/__key/system/images/embedcode.png","configurable":true},{"name":"Code","typeid":"dc8ab71f-3b98-42d9-b0f6-e21e02a0f8e2","previewUrl":"/cfs-file/__key/system/images/embedcode.png","configurable":true}],browser_spellcheck : true,autolink_pattern: /((?:http|ftp|https):\/\/)([\w\-]{1,63}(?:\.[\w\-]{1,63}){0,127}(?:\([\w\-\.,@?!^=%&:/~\+#]{0,2046}\)|[\w\-\.,@?!^=%&:/~\+#]{0,2047}[\w\-@?^=%&:/~\+#]){0,2048})/i,paste_data_images: true,submit_entermessage:'Enter to Reply',submit_buttontext:'Reply',submit_onsubmit:function() { jQuery.telligent.evolution.messaging.publish('widgets.threadedComments.submit') },submit_entertosubmit: true,
+    document_base_url: tinyMCE_TelligentEvolutionOptions.GetBaseUrl(),
+	images_dataimg_filter: function() { return false; },
+    anchor_bottom: false,
+    anchor_top: false,
+    content_css: 'https:\/\/devzone.nordicsemi.com\/tinymce\/telligent\/telligent.tinymce.content.css',style_formats:[{
+			title: 'Inline', items: [
+					{ title: 'Bold', icon: 'bold', format: 'bold'},
+					{ title: 'Italic', icon: 'italic', format: 'italic'},
+					{ title: 'Underline', icon: 'underline', format: 'underline'},
+					{ title: 'Strikethrough', icon: 'strikethrough', format: 'strikethrough'},
+				{ title: 'Superscript', icon: 'superscript', format: 'superscript'},
+				{ title: 'Subscript', icon: 'subscript', format: 'subscript'},]}, {
+				title: 'Blocks', items: [
+					{ title: 'Paragraph', format: 'p'},
+					{ title: 'Blockquote', format: 'blockquote'},
+					{ title: 'Div', format: 'div'},
+					{ title: 'Pre', format: 'pre'}
+				]},
+				{
+				title: 'Alignment', items: [
+					{ title: 'Left', icon: 'alignleft', format: 'alignleft'},
+					{ title: 'Center', icon: 'aligncenter', format: 'aligncenter'},
+					{ title: 'Right', icon: 'alignright', format: 'alignright'},
+					{ title: 'Justify', icon: 'alignjustify', format: 'alignjustify'}
+				]}],valid_elements:'@[class|style|align|id|dir|lang|title],a[charset|href|hreflang|name|rel|rev|target|type],b,bdo,blockquote[cite],br[clear],dd,div,dl,dt,em,i,img[alt|border|height|hspace|longdesc|name|src|vspace|width],li,meta[charset|content|name|scheme],meter[max|min|value|high|low|optimum],ol[start|reversed],p,pre,progress[value|max],s,span,strike,strong,sub,sup,tt,u,ul',valid_styles: {'*':'clear,float,font-style,font-weight,text-align,text-decoration,text-indent,vertical-align'},protect:[/\<\!\-\-.*?\-\-\>/g,/\<\!\[CDATA\[.*?\]\]\>/g],
+    directionality: 'ltr'
+});
+// ]]>
+</script>
+<div id="mceu_24" class="mce-tinymce mce-container mce-panel mce-editor-submittable mce-editor-desktop mce-editor-blur mce-submitpanel-narrow" hidefocus="1" tabindex="-1" role="application" style="visibility: hidden; border-width: 1px; height: auto; overflow: visible;"><div id="mceu_24-body" class="mce-container-body mce-stack-layout"><div id="mceu_25" class="mce-container mce-menubar mce-toolbar mce-stack-layout-item mce-first" role="menubar" style="border-width: 0px 0px 1px; display: none;"><div id="mceu_25-body" class="mce-container-body mce-flow-layout"><div id="mceu_26" class="mce-widget mce-btn mce-menubtn mce-flow-layout-item mce-first mce-btn-has-text" tabindex="-1" aria-labelledby="mceu_26" role="menuitem" aria-haspopup="true"><button id="mceu_26-open" role="presentation" type="button" tabindex="-1"><span class="mce-txt">Edit</span> <i class="mce-caret"></i></button></div><div id="mceu_27" class="mce-widget mce-btn mce-menubtn mce-flow-layout-item mce-btn-has-text" tabindex="-1" aria-labelledby="mceu_27" role="menuitem" aria-haspopup="true"><button id="mceu_27-open" role="presentation" type="button" tabindex="-1"><span class="mce-txt">Insert</span> <i class="mce-caret"></i></button></div><div id="mceu_28" class="mce-widget mce-btn mce-menubtn mce-flow-layout-item mce-btn-has-text" tabindex="-1" aria-labelledby="mceu_28" role="menuitem" aria-haspopup="true"><button id="mceu_28-open" role="presentation" type="button" tabindex="-1"><span class="mce-txt">Format</span> <i class="mce-caret"></i></button></div><div id="mceu_29" class="mce-widget mce-btn mce-menubtn mce-flow-layout-item mce-last mce-btn-has-text" tabindex="-1" aria-labelledby="mceu_29" role="menuitem" aria-haspopup="true"><button id="mceu_29-open" role="presentation" type="button" tabindex="-1"><span class="mce-txt">Tools</span> <i class="mce-caret"></i></button></div></div></div><div id="mceu_33" class="mce-edit-area mce-container mce-panel mce-stack-layout-item mce-last" hidefocus="1" tabindex="-1" role="group" style="border-width: 0px 0px 1px; position: relative;"><iframe id="fragment-167_fragment-167_replyEditor_ifr" frameborder="0" allowtransparency="true" title="Rich Text Area. Press ALT-F9 for menu. Press ALT-F10 for toolbar. Press ALT-0 for help" src="javascript:&quot;&quot;" style="width: 100%; height: 60px; display: block;" src="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/saved_resource(1).html"></iframe><div style="position: absolute; top: 0px; left: 0px;"><div class="mceDragDropShade" style="position: absolute; display: none; left: 0px; top: 0px;"></div><div class="mceDragDropMessage" style="position: absolute; display: none; left: 0px; top: 0px;"></div></div></div><div id="mceu_30" class="mce-toolbar-grp mce-container mce-panel mce-stack-layout-item" hidefocus="1" tabindex="-1" role="group"><div id="mceu_30-body" class="mce-container-body mce-stack-layout"><div id="mceu_31" class="mce-container mce-toolbar mce-stack-layout-item mce-first mce-last" role="toolbar"><div id="mceu_31-body" class="mce-container-body mce-flow-layout"><div id="mceu_32" class="mce-container mce-flow-layout-item mce-first mce-last mce-btn-group" role="group" style="width: 100%;"><div id="mceu_32-body" style="white-space: normal;"><div id="mceu_17" class="mce-widget mce-btn mce-menubtn mce-first mce-btn-has-text" tabindex="-1" aria-labelledby="mceu_17" role="button" aria-haspopup="true"><button id="mceu_17-open" role="presentation" type="button" tabindex="-1"><span class="mce-txt">Edit</span> <i class="mce-caret"></i></button></div><div id="mceu_18" class="mce-widget mce-btn mce-menubtn mce-btn-has-text" tabindex="-1" aria-labelledby="mceu_18" role="button" aria-haspopup="true"><button id="mceu_18-open" role="presentation" type="button" tabindex="-1"><span class="mce-txt">Insert</span> <i class="mce-caret"></i></button></div><div id="mceu_19" class="mce-widget mce-btn mce-menubtn mce-btn-has-text" tabindex="-1" aria-labelledby="mceu_19" role="button" aria-haspopup="true"><button id="mceu_19-open" role="presentation" type="button" tabindex="-1"><span class="mce-txt">Format</span> <i class="mce-caret"></i></button></div><div id="mceu_20" class="mce-widget mce-btn mce-menubtn mce-btn-has-text" tabindex="-1" aria-labelledby="mceu_20" role="button" aria-haspopup="true"><button id="mceu_20-open" role="presentation" type="button" tabindex="-1"><span class="mce-txt">Tools</span> <i class="mce-caret"></i></button></div><div id="mceu_21" class="mce-widget mce-btn" tabindex="-1" aria-labelledby="mceu_21" role="button" aria-label="Bullet list"><button role="presentation" type="button" tabindex="-1"><i class="mce-ico mce-i-bullist"></i></button></div><div id="mceu_22" class="mce-widget mce-btn" tabindex="-1" aria-labelledby="mceu_22" role="button" aria-label="Numbered list"><button role="presentation" type="button" tabindex="-1"><i class="mce-ico mce-i-numlist"></i></button></div><div id="mceu_23" class="mce-widget mce-submitpanel mce-last" tabindex="0" role="presentation" aria-haspopup="false"><div id="mceu_23_enable_wrapper" class="mce-submitpanel-message"><input id="mceu_23_enable" type="checkbox" role="presentation" tabindex="-1" class="mce-submitpanel-checked" checked="checked"><label for="mceu_23_enable" tabindex="-1" role="presentation">Enter to Reply</label></div><div class="mce-widget mce-btn mce-primary mce-btn-has-text mce-submitpanel-button" tabindex="-1" id="mceu_23_send" role="button" style="display: none;"><button tabindex="-1" style="width:100%; height:100%;" type="button"><span class="mce-txt">Reply</span></button></div></div></div></div></div></div></div></div></div></div><textarea id="fragment-167_fragment-167_replyEditor" name="ctl02$ctl02$w_167$fragment-167_fragment-167_replyEditor" style="width: 100%; height: 85px; display: none;" aria-hidden="true"></textarea></div>
+
+
+
+
+			</div>
+<div class="content-fragment-footer"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="layout-footer"></div>
+</div></div><div class="footer-fragments-header"></div>
+<div class="single-column footer-fragments evolution-reflow-container" data-related="ctl02_ctl03_page" id="ctl02_ctl03_singlecolumn" style="display:none"></div><div class="footer-fragments evolution-reflow-container" data-related="ctl02_ctl03_singlecolumn" id="ctl02_ctl03_page"><div class="layout">
+<div class="layout-header"></div>
+<div class="layout-content content" id="ctl02_ctl03_layout"><div class="layout-region content" id="ctl02_ctl03_content">
+<div class="layout-region-inner content"><div id="footer-98"></div>
+<div id="footer-99"></div>
+<div id="footer-100"></div>
+<div id="footer-101"></div>
+<div id="footer-102"></div>
+</div>
+</div>
+</div>
+<div class="layout-footer"></div>
+</div></div><div class="footer-fragments-footer"></div>
+
+
+	<script type="text/html" id="site-banner-notification-preferences-template">
+		<div class="notification-preference">
+			<span class="description">Do not notify me when someone <strong><%: notificationTypeName %></strong>?</span>
+			<a href="#" class="confirm internal-link button submit-button" data-notificationtypeid="<%: notificationTypeId %>">Confirm</a>
+			<a href="#" class="cancel internal-link button submit-button">Cancel</a>
+		</div>
+	</script>
+
+
+	<script type="text/html" id="site-banner-list-template">
+		<div>
+			<div class="multiple-column-list columns-1">
+				<div class="multiple-column-item column-1">
+					<ul class="content-list content">
+					</ul>
+					<div class="loading">Loading...</div>
+					<% if(footerContent) { %>
+						<div class="content-list-footer">
+							<%= footerContent %>
+						</div>
+					<% } %>
+				</div>
+			</div>
+		</div>
+	</script>
+
+
+	<script type="text/html" id="site-banner-bookmark-filter-template">
+
+		<ul class="navigation-list filter">
+			<% if(contentTypeIds && contentTypeIds.length > 0) { %>
+				<li class="navigation-item conversations">
+					<a class="internal-link" href="#" data-contenttypeids="<%: contentTypeIds %>">Content</a>
+				</li>
+			<% } %>
+			<% if(applicationContentTypeIds && applicationContentTypeIds.length > 0) { %>
+				<li class="navigation-item conversations">
+					<a class="internal-link" href="#" data-contenttypeids="<%: applicationContentTypeIds %>">Application</a>
+				</li>
+			<% } %>
+			<% if(containerTypes && containerTypes.length > 0) { %>
+				<% foreach(containerTypes, function(containerType) {  %>
+					<li class="navigation-item conversations">
+						<a class="internal-link" href="#" data-contenttypeids="<%: containerType.id %>"><%: containerType.name %></a>
+					</li>
+				<% }); %>
+			<% } %>
+		</ul>
+
+	</script>
+
+	<script type="text/html" id="site-banner-search-filter-template">
+		<% if(places && places.length > 0) { %>
+			<ul class="navigation-list filter">
+				<% foreach(places, function(place) { %>
+					<li class="navigation-item">
+						<a class="place internal-link" href="#" data-key="<%: place.key %>" data-value="<%: place.value %>" data-searchparam="<%: place.searchParameter %>" data-searchvalue="<%: place.searchValue %>"><%= place.name %></a>
+				<% }); %>
+			</ul>
+		<% } %>
+
+		<% if(filters && filters.length > 0) { %>
+			<ul class="navigation-list filter">
+			<% foreach(filters, function(filter) {  %>
+				<li class="navigation-item">
+					<a class="type internal-link" href="#" data-key="<%: filter.key %>"><%= filter.name %></a>
+				</li>
+			<% }); %>
+			</ul>
+		<% } %>
+	</script>
+
+	<script type="text/html" id="site-banner-user-template">
+		<div class="user">
+			<div class="avatar">
+				<a href="$core_v2_encoding.HtmlAttributeEncode($user.ProfileUrl)">
+					<img src="/cfs-filesystemfile/__key/communityserver-components-imagefileviewer/system-images/anonymous.gif_2D00_40x40x2.png?_=636912731399214913" />
+				</a>
+			</div>
+			<span class="user-name">
+				<a href="$core_v2_encoding.HtmlAttributeEncode($user.ProfileUrl)">Anonymous</a>
+			</span>
+
+								</div>
+
+							<ul class="navigation-list user">
+																																																																																																																																																						    <li class="navigation-list-item">
+					<a href="$core_v2_encoding.HtmlAttributeEncode($ticketListUrl)">View my tickets</a>
+				</li>
+								</ul>
+			</script>
+
+	<script type="text/javascript" src="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/ui.js.Без названия"></script>
+	<script type="text/javascript">
+		
+		
+
+		
+						
+		
+		
+		jQuery(function(){
+			jQuery.telligent.evolution.widgets.siteBanner.register({
+				wrapper: '#header-29',
+				messagePrefix: 'widget.header-29.',
+				userPopupTemplate: 'site-banner-list-template',
+				banner: jQuery('#header-29_banner'),
+									handheldSearchFieldsLink: jQuery('#header-29_handheldSearchFieldsLink'),
+					handheldSearchFields: jQuery('#header-29_handheldSearchFields'),
+					handheldBannerLinksLink: jQuery('#header-29_handheldBannerLinksLink'),
+					handheldBannerLinks: jQuery('#header-29_handheldBannerLinks'),
+					handheldBannerLinksCount: jQuery('#header-29_handheldBannerLinksCount'),
+					bannerSiteLinks: jQuery('#header-29_bannerSiteLinks'),
+					handheldSiteLinksLink: jQuery('#header-29_handheldSiteLinksLink'),
+					handheldSiteLinks: jQuery('#header-29_handheldSiteLinks'),
+
+											siteNavigationType: '$core_v2_encoding.JavascriptEncode($siteNavigationType)',
+						siteNavigationUrl: '$core_v2_encoding.JavascriptEncode($siteNavigationUrl)',
+						siteNavigationTemplate: 'site-banner-list-template',
+						siteNavigationLink: jQuery('#header-29_site'),
+						siteNavigationTitle:  							''
+						,
+													siteNavigationCustomItems:[
+														 
+								,{
+									label: 'All groups',
+									url: '/g'
+								}
+														],
+																								searchFields: jQuery('#header-29_searchFields'),
+					searchTemplate: 'site-banner-list-template',
+					searchUrl: '/utility/scripted-file.ashx?CommentId=65e44d50-75c4-4359-87bc-2313f8368a2d\u0026_cf=search.vm\u0026_fid=29\u0026_ct=header\u0026_cp=\u0026_ctt=a3b17ab0af5f11dda3501fcf55d89593\u0026_ctc=584024ec88b448a4aa4f1836f487255b\u0026_ctn=a4b603bd26214a2c832b0da0b8713054\u0026_cc=0\u0026_pcurl=~%2Fnordic%2Fnordic-blog%2Fb%2Fblog%2Fposts%2Finstrumenting-with-segger-systemview%3FCommentId%3D65e44d50-75c4-4359-87bc-2313f8368a2d',
+					searchInput: jQuery('#header-29_Search'),
+					searchFooterContent: '\u003ca data-messagename=\"widget.header-29.advancedsearch\" class=\"right\" id=\"header-29_advancedsearch\" href=\"#\"\u003eAdvanced search\u003c/a\u003e',
+					searchFilterTemplate: 'site-banner-search-filter-template',
+					searchAdvancedUrl: '/search?{0}',
+					searchAdvancedUserUrl: '/members?{0}',
+					searchFilterContentName: 'Content',
+					searchFilterGroupsName: 'Groups',
+					searchFilterPeopleName: 'People',
+					searchPlaceApplicationId: null,
+					searchPlaceApplicationName: null,
+					searchPlaceGroupId: null,
+					searchPlaceGroupLocalId: null,
+					searchPlaceGroupName: null,
+					searchPlaceAnywhereName: 'Anywhere',
+					advancedSearchId: 'header-29_advancedsearch',
+					searchShowPeople:  false,
+													bannerLinks: jQuery('#header-29_bannerLinks'),
+
+					notificationsTemplate: 'site-banner-list-template',
+					notificationsUrl: '/utility/scripted-file.ashx?CommentId=65e44d50-75c4-4359-87bc-2313f8368a2d\u0026_cf=notifications.vm\u0026_fid=29\u0026_ct=header\u0026_cp=\u0026_ctt=a3b17ab0af5f11dda3501fcf55d89593\u0026_ctc=584024ec88b448a4aa4f1836f487255b\u0026_ctn=a4b603bd26214a2c832b0da0b8713054\u0026_cc=0\u0026_pcurl=~%2Fnordic%2Fnordic-blog%2Fb%2Fblog%2Fposts%2Finstrumenting-with-segger-systemview%3FCommentId%3D65e44d50-75c4-4359-87bc-2313f8368a2d',
+					notificationsLink: jQuery('#header-29_notifications'),
+					notificationsUnread: 0,
+					notificationListFooterContent: '\u003ca href=\"$core_v2_urls.Notifications()\" class=\"view-all left\"\u003eView all\u003c/a\u003e\u003ca class=\"right\" href=\"${notificationSettingsUrl}\"\u003eSettings\u003c/a\u003e',
+					notificationPreferenceTemplate: 'site-banner-notification-preferences-template',
+					notificationssUnreadCountMessageSingular: 'You have {0} unread notification',
+					notificationssUnreadCountMessagePlural: 'You have {0} unread notifications',
+
+					conversationsTemplate: 'site-banner-list-template',
+					conversationsUrl: '/utility/scripted-file.ashx?CommentId=65e44d50-75c4-4359-87bc-2313f8368a2d\u0026_cf=conversations.vm\u0026_fid=29\u0026_ct=header\u0026_cp=\u0026_ctt=a3b17ab0af5f11dda3501fcf55d89593\u0026_ctc=584024ec88b448a4aa4f1836f487255b\u0026_ctn=a4b603bd26214a2c832b0da0b8713054\u0026_cc=0\u0026_pcurl=~%2Fnordic%2Fnordic-blog%2Fb%2Fblog%2Fposts%2Finstrumenting-with-segger-systemview%3FCommentId%3D65e44d50-75c4-4359-87bc-2313f8368a2d',
+					conversationsLink: jQuery('#header-29_conversations'),
+					conversationsUnread: 0,
+					conversationNotificationTypeId: '84e4c0a7-3a17-4dfe-b8a0-d7038aa04a84',
+					conversationListFooterContent: '\u003ca href=\"${core_v2_urls.Conversations()}\" class=\"left\"\u003eView all\u003c/a\u003e\u003ca href=\"#\" data-messagename=\"widget.header-29.startconversation\" class=\"right\"\u003eNew message\u003c/a\u003e',
+					conversationsUnreadCountMessageSingular: 'You have {0} unread message',
+					conversationsUnreadCountMessagePlural: 'You have {0} unread messages',
+					conversationNewConversationUrl: null ,
+
+					bookmarksTemplate: 'site-banner-list-template',
+					bookmarksUrl: '/utility/scripted-file.ashx?CommentId=65e44d50-75c4-4359-87bc-2313f8368a2d\u0026_cf=bookmarks.vm\u0026_fid=29\u0026_ct=header\u0026_cp=\u0026_ctt=a3b17ab0af5f11dda3501fcf55d89593\u0026_ctc=584024ec88b448a4aa4f1836f487255b\u0026_ctn=a4b603bd26214a2c832b0da0b8713054\u0026_cc=0\u0026_pcurl=~%2Fnordic%2Fnordic-blog%2Fb%2Fblog%2Fposts%2Finstrumenting-with-segger-systemview%3FCommentId%3D65e44d50-75c4-4359-87bc-2313f8368a2d',
+					bookmarksLink: jQuery('#header-29_bookmarks'),
+					bookmarksListFooterContent: '\u003ca class=\"left\" href=\"${bookmarksUrl}\"\u003eView all\u003c/a\u003e',
+					bookmarksContentTypes: '$core_v2_encoding.JavascriptEncode($contentTypes)',
+					bookmarksApplicationContentTypes: '$core_v2_encoding.JavascriptEncode($applicationContentTypes)',
+					bookmarksContainerContentTypes: '$core_v2_encoding.JavascriptEncode($containerContentTypes)',
+					bookmarksFilterTemplate: 'site-banner-bookmark-filter-template',
+					bookmarksIsBookmarked:  false ,
+					bookmarksCurrentContentId: '',
+					bookmarksBookmarks: 'Bookmarks',
+					bookmarkAdded: 'Bookmark added',
+					bookmarkRemoved: 'Bookmark removed',
+
+					userContentTemplate: 'site-banner-user-template',
+								
+				viewType: 'all'
+			});
+		});
+	</script>
+		<script>
+		jQuery(function(j){
+			// no sub-nav on touch
+			if(j('body').hasClass('touch'))
+				return;
+
+			var container = j('#header-55_container');
+			var popup;
+			var currentParent;
+
+			function hideLinksPopup() {
+				if(popup) {
+					popup.glowPopUpPanel('hide');
+					$(currentParent).removeClass('subnav-open');
+					currentParent = null;
+					popup = null;
+				}
+			}
+
+			function showLinksPopUp(parent, children) {
+				parent.addClass('subnav-open');
+				if(currentParent == parent.get(0)) {
+					return;
+				}
+
+				var links = j('<ul></ul>').append(children);
+				links.on('mouseleave', function(e){
+					if(e.relatedTarget != parent.get(0))
+						hideLinksPopup();
+				});
+
+				if(popup) {
+					hideLinksPopup();
+					popup.glowPopUpPanel('empty', '')
+						.glowPopUpPanel('append', links)
+						.glowPopUpPanel('show', parent);
+				} else {
+					popup = j('<div></div>')
+						.glowPopUpPanel({
+							cssClass: 'links-popup-panel',
+							zIndex: 1500,
+							hideOnDocumentClick: true
+						})
+						.glowPopUpPanel('append', links)
+						.glowPopUpPanel('show', parent)
+					currentParent = parent.get(0);
+				}
+			}
+
+			container.on('mouseenter', '.navigation-list-item a', function(e){
+				var elm = j(e.target);
+				var children = elm.data('_link_children');
+				if(!children) {
+					children = elm.closest('li').find('ul.children > li');
+					elm.data('_link_children', children);
+				}
+				if(children && children.length > 0) {
+					showLinksPopUp(elm, children);
+				}
+			});
+
+			container.on('mouseleave', '.navigation-list-item a', function(e){
+				if(!(e.relatedTarget &&
+					(j(e.relatedTarget).is('.links-popup-panel') ||
+					j(e.relatedTarget).closest('.links-popup-panel').length > 0)))
+					hideLinksPopup();
+			});
+		});
+		</script>
+	<script type="text/javascript">
+// <![CDATA[
+if (!$.telligent.evolution.contentFragmentContainers) { $.telligent.evolution.contentFragmentContainers = {}; }
+$.telligent.evolution.contentFragmentContainers.header = new ContentFragmentContainerCustomCallback('ctl02_ctl01_page',new Function('mode','parameters','callback','errorCallback','context','authValue','ctl02_ctl01_ctl00._doCallback(mode+\':\'+authValue+\':\'+parameters,callback,context,errorCallback);'),'AuthorizationCookie');
+// ]]>
+</script>
+<script type="text/javascript">
+//<![CDATA[
+$(window).load(function () { 
+                $('.content-inline-editor').hover( 
+              function () { 
+                $(this).addClass('highlight'); 
+              },  
+              function () { 
+                $(this).removeClass('highlight');
+              } 
+            );});//]]>
+</script>
+	<script type="text/javascript" src="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/ui.js(1).Без названия"></script>
+			<script type="text/html" id="telligent.evolution.widgets.moreContent.sliderTemplate">
+			<div class="recommended-content-slider-content">
+				<a href="#" data-messagename="telligent.evolution.widgets.more.slider.close" class="close">Close</a>
+				<% foreach(contents, function(content) { %>
+					<h2><%= content.title %></h2>
+					<%= content.content %>
+				<% }); %>
+			</div>
+		</script>
+		<script type="text/javascript">
+	jQuery(document).ready(function() {
+		jQuery.telligent.evolution.widgets.moreContent.register({
+			wrapper: '#fragment-159',
+			useSlider:  true ,
+			title: 'Related',
+			content: '#pi159-paged-content',
+			sliderTemplate: 'telligent.evolution.widgets.moreContent.sliderTemplate',
+			slideAt: 0.8,
+			delayedPagedContentWrapper: 'fragment-159_delayedPagedContentWrapper',
+			delayedPagedContentUrl: "/utility/scripted-file.ashx?CommentId=65e44d50-75c4-4359-87bc-2313f8368a2d\u0026_cf=content.vm\u0026_fid=159\u0026_ct=page\u0026_cp=post\u0026_ctt=a3b17ab0af5f11dda3501fcf55d89593\u0026_ctc=584024ec88b448a4aa4f1836f487255b\u0026_ctn=a4b603bd26214a2c832b0da0b8713054\u0026_cc=0\u0026_pcurl=~%2Fnordic%2Fnordic-blog%2Fb%2Fblog%2Fposts%2Finstrumenting-with-segger-systemview%3FCommentId%3D65e44d50-75c4-4359-87bc-2313f8368a2d",
+			isPreview:  false		});
+	});
+	</script>
+	<script type="text/javascript">
+	jQuery(document).ready(function() {
+		jQuery.telligent.evolution.widgets.moreContent.register({
+			wrapper: '#fragment-160',
+			useSlider:  false ,
+			title: 'Recommended',
+			content: '#pi160-paged-content',
+			sliderTemplate: 'telligent.evolution.widgets.moreContent.sliderTemplate',
+			slideAt: 0.8,
+			delayedPagedContentWrapper: 'fragment-160_delayedPagedContentWrapper',
+			delayedPagedContentUrl: "/utility/scripted-file.ashx?CommentId=65e44d50-75c4-4359-87bc-2313f8368a2d\u0026_cf=content.vm\u0026_fid=160\u0026_ct=page\u0026_cp=post\u0026_ctt=a3b17ab0af5f11dda3501fcf55d89593\u0026_ctc=584024ec88b448a4aa4f1836f487255b\u0026_ctn=a4b603bd26214a2c832b0da0b8713054\u0026_cc=0\u0026_pcurl=~%2Fnordic%2Fnordic-blog%2Fb%2Fblog%2Fposts%2Finstrumenting-with-segger-systemview%3FCommentId%3D65e44d50-75c4-4359-87bc-2313f8368a2d",
+			isPreview:  false		});
+	});
+	</script>
+<script>jQuery.telligent.evolution.template.register('fragment-167_loadMoreTemplate',function(h,d){var s=[];with(d){with(h){s.push('	<li class=\"load-more '); if(previous) { s.push(' previous '); } else { s.push(' next '); } s.push('\" '); if (loadInline) { s.push(' data-inline=\"inline\" '); } s.push('>\r\n	'); if(previous) { s.push('\r\n		<a class=\"previous\" href=\"#\" '); if (loadInline) { s.push(' data-inline=\"inline\" '); } s.push('>Load Previous <\/a>\r\n	'); } else { s.push('\r\n		<a class=\"next\" href=\"#\" '); if (loadInline) { s.push(' data-inline=\"inline\" '); } s.push('>Load Next <\/a>\r\n	'); } s.push('\r\n	<span class=\"ui-loading\" data-width=\"24\" data-height=\"24\"><\/span>\r\n<\/li>\r\n\r\n');}}return s.join('');});</script><script>jQuery.telligent.evolution.template.register('fragment-167_newRepliesTemplate',function(h,d){var s=[];with(d){with(h){s.push('	<div class=\"threaded new-replies '); if(offscreen) { s.push(' offscreen '); } s.push('\" '); if(offscreen) { s.push(' style=\"width: ');s.push(String( width ));s.push('px\" '); } s.push('>\r\n	<a href=\"#\" data-messagename=\"ui.replies.new\" data-replyid=\"');s.push(String( replyId ));s.push('\">\r\n		'); if(newReplies == 1) { s.push('\r\n			');s.push(String( newReplies ));s.push(' new reply\r\n		'); } else { s.push('\r\n			');s.push(String( newReplies ));s.push(' new replies\r\n		'); } s.push('\r\n	<\/a>\r\n<\/div>\r\n\r\n');}}return s.join('');});</script><script>jQuery.telligent.evolution.template.register('fragment-167_replyTemplate',function(h,d){var s=[];with(d){with(h){s.push('	<li class=\"threaded content-item '); if(isDeleted) { s.push(' deleted '); } s.push('\"\r\n	data-id=\"');s.push(escape(String( id )));s.push('\"\r\n	data-parentid=\"');s.push(escape(String( parentId )));s.push('\"\r\n	data-createddate=\"');s.push(escape(String( createdDate )));s.push('\"\r\n	data-yesvotes=\"');s.push(escape(String( yesVotes )));s.push('\"\r\n	data-novotes=\"');s.push(escape(String( noVotes )));s.push('\">\r\n\r\n	<div class=\"rendered-content\">\r\n		');s.push(String( body ));s.push('\r\n		<div class=\"typing-status-wrapper\"><\/div>\r\n		<div class=\"new-replies-wrapper\"><\/div>\r\n	<\/div>\r\n\r\n	<div class=\"newreply\"><\/div>\r\n\r\n	<ul class=\"content-list threaded\"\r\n	data-sortby=\"');s.push(String( sortBy ));s.push('\" \r\n	data-sortorder=\"');s.push(String( sortOrder ));s.push('\"><\/ul>\r\n\r\n<\/li>\r\n\r\n');}}return s.join('');});</script><script>jQuery.telligent.evolution.template.register('fragment-167_replyFormTemplate',function(h,d){var s=[];with(d){with(h){s.push('	<div class=\"reply-form '); if (editingReplyId) { s.push(' edit '); } else { s.push(' create '); } s.push('\" '); if (editingReplyId) { s.push(' data-editing=\"');s.push(String( editingReplyId ));s.push('\" '); } s.push('>\r\n	'); if(!editingReplyId) { s.push('\r\n		\r\n		<div class=\"author\"  data-authorprofileurl=\"\" >\r\n			<div class=\"avatar\">\r\n									<img src=\"\/cfs-filesystemfile\/__key\/communityserver-components-imagefileviewer\/system-images\/anonymous.gif_2D00_44x44x2.png?_=636912731400615917\" border=\"0px\" alt=\"Anonymous\" \/>\r\n							<\/div>\r\n			<div class=\"meta\">\r\n				<span class=\"user-name\">\r\n					<span class=\"ui-userpresence ui-tip \" style=\"display: none;\"\r\ndata-userid=\"2101\" \r\ndata-contentid=\"5aff8d5d-ed30-4b52-a4a8-bf13e428a7e1\" \r\ndata-contenttypeid=\"e9ed4118-60ed-4f2b-a026-5705b8793d05\" \r\ndata-present=\"\" \r\ndata-presentlabel=\"Online\" \r\ndata-notpresentlabel=\"Offline\" \r\ndata-tip=\"\"><\/span>\r\n											Anonymous\r\n									<\/span>\r\n			<\/div>\r\n		<\/div>\r\n	'); } s.push('\r\n\r\n	<div class=\"editor\"><\/div>\r\n\r\n<\/div>\r\n\r\n');}}return s.join('');});</script><script>jQuery.telligent.evolution.template.register('fragment-167_typingIndicatorTemplate',function(h,d){var s=[];with(d){with(h){s.push('	<div class=\"threaded typing-status\">');s.push(String( displayName ));s.push(' is typing a reply...<\/div>\r\n\r\n');}}return s.join('');});</script><script>jQuery.telligent.evolution.template.register('fragment-167_replyListTemplate',function(h,d){var s=[];with(d){with(h){s.push('	<ul class=\"content-list threaded\"\r\n	data-sortby=\"');s.push(String( sortBy ));s.push('\" \r\n	data-sortorder=\"');s.push(String( sortOrder ));s.push('\"><\/ul>\r\n\r\n');}}return s.join('');});</script><script>jQuery.telligent.evolution.template.register('fragment-167_headerTemplate',function(h,d){var s=[];with(d){with(h){s.push('	<div class=\"threaded-filter\" id=\"fragment-167_filter\">\r\n	<ul class=\"filter order margin-bottom margin-top\">\r\n		<li class=\"filter-option\" data-sortby=\"CreatedDate\" data-sortorder=\"Ascending\">\r\n			<a class=\"navigable\" href=\"?CommentSortBy=CreatedDate&amp;CommentSortOrder=Ascending\">Oldest<\/a>\r\n		<\/li>\r\n					<li class=\"filter-option\" data-sortby=\"Votes\" data-sortorder=\"Descending\">\r\n				<a class=\"navigable\" href=\"?CommentSortBy=Votes&amp;CommentSortOrder=Descending\">Best<\/a>\r\n			<\/li>\r\n				<li class=\"filter-option\" data-sortby=\"CreatedDate\" data-sortorder=\"Descending\">\r\n			<a class=\"navigable\" href=\"?CommentSortBy=CreatedDate&amp;CommentSortOrder=Descending\">Newest<\/a>\r\n		<\/li>\r\n	<\/ul>\r\n<\/div>\r\n\r\n');}}return s.join('');});</script><script>jQuery.telligent.evolution.template.register('fragment-167_statisticsTemplate',function(h,d){var s=[];with(d){with(h){s.push('	<ul class=\"attribute-list\">\r\n<li class=\"attribute-item count\">\r\n	<span class=\"value\">\r\n		'); if(commentCount == 1) { s.push('\r\n			');s.push(String( commentCount ));s.push(' comment\r\n		'); } else { s.push('\r\n			');s.push(String( commentCount ));s.push(' comments\r\n		'); } s.push('\r\n	<\/span>\r\n<\/li>\r\n<li class=\"attribute-item users\">\r\n	<span class=\"value\">\r\n		'); if(userCount == 1) { s.push('\r\n			');s.push(String( userCount ));s.push(' member is here\r\n		'); } else { s.push('\r\n			');s.push(String( userCount ));s.push(' members are here\r\n		'); } s.push('\r\n	<\/span>\r\n<\/li>\r\n<\/ul>\r\n\r\n');}}return s.join('');});</script>	<script type="text/javascript" src="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/ui.js(2).Без названия"></script>
+	<script type="text/javascript">
+	jQuery(document).ready(function() {
+		jQuery.telligent.evolution.widgets.comments.register({
+			commentId:  '65e44d50-75c4-4359-87bc-2313f8368a2d' ,
+			preFocus:  false ,
+			wrapperId: 'fragment-167',
+			wrapper: '#fragment-167',
+			container: '#fragment-167_preRenderedWrapperId',
+			bestRepliesWrapperId: 'fragment-167_bestRepliesWrapper',
+			contentId: '4ede12c4-e96f-41bd-9393-8ce94a608296',
+			contentTypeId: 'f7d226ab-d59f-475c-9d22-4a79e3f0ec07',
+			sortOrder: 'Descending',
+			sortBy: 'Votes',
+			flattenedSortBy: 'CreatedDate',
+			flattenedSortOrder: 'Ascending',
+			flattenedDepth: 2,
+			pageSize: 5,
+			endlessScroll:  true ,
+			listRepliesUrl: '/utility/scripted-file.ashx?CommentId=65e44d50-75c4-4359-87bc-2313f8368a2d\u0026_cf=callback-model-list-replies.vm\u0026_fid=167\u0026_ct=page\u0026_cp=post\u0026_ctt=a3b17ab0af5f11dda3501fcf55d89593\u0026_ctc=584024ec88b448a4aa4f1836f487255b\u0026_ctn=a4b603bd26214a2c832b0da0b8713054\u0026_cc=0\u0026_pcurl=~%2Fnordic%2Fnordic-blog%2Fb%2Fblog%2Fposts%2Finstrumenting-with-segger-systemview%3FCommentId%3D65e44d50-75c4-4359-87bc-2313f8368a2d',
+			addReplyUrl: '/utility/scripted-file.ashx?CommentId=65e44d50-75c4-4359-87bc-2313f8368a2d\u0026_cf=callback-model-add-reply.vm\u0026_fid=167\u0026_ct=page\u0026_cp=post\u0026_ctt=a3b17ab0af5f11dda3501fcf55d89593\u0026_ctc=584024ec88b448a4aa4f1836f487255b\u0026_ctn=a4b603bd26214a2c832b0da0b8713054\u0026_cc=0\u0026_pcurl=~%2Fnordic%2Fnordic-blog%2Fb%2Fblog%2Fposts%2Finstrumenting-with-segger-systemview%3FCommentId%3D65e44d50-75c4-4359-87bc-2313f8368a2d',
+			editReplyUrl: '/utility/scripted-file.ashx?CommentId=65e44d50-75c4-4359-87bc-2313f8368a2d\u0026_cf=callback-model-edit-reply.vm\u0026_fid=167\u0026_ct=page\u0026_cp=post\u0026_ctt=a3b17ab0af5f11dda3501fcf55d89593\u0026_ctc=584024ec88b448a4aa4f1836f487255b\u0026_ctn=a4b603bd26214a2c832b0da0b8713054\u0026_cc=0\u0026_pcurl=~%2Fnordic%2Fnordic-blog%2Fb%2Fblog%2Fposts%2Finstrumenting-with-segger-systemview%3FCommentId%3D65e44d50-75c4-4359-87bc-2313f8368a2d',
+			getReplyUrl: '/utility/scripted-file.ashx?CommentId=65e44d50-75c4-4359-87bc-2313f8368a2d\u0026_cf=callback-model-get-reply.vm\u0026_fid=167\u0026_ct=page\u0026_cp=post\u0026_ctt=a3b17ab0af5f11dda3501fcf55d89593\u0026_ctc=584024ec88b448a4aa4f1836f487255b\u0026_ctn=a4b603bd26214a2c832b0da0b8713054\u0026_cc=0\u0026_pcurl=~%2Fnordic%2Fnordic-blog%2Fb%2Fblog%2Fposts%2Finstrumenting-with-segger-systemview%3FCommentId%3D65e44d50-75c4-4359-87bc-2313f8368a2d',
+			listBestUrl: '/utility/scripted-file.ashx?CommentId=65e44d50-75c4-4359-87bc-2313f8368a2d\u0026_cf=callback-model-list-best.vm\u0026_fid=167\u0026_ct=page\u0026_cp=post\u0026_ctt=a3b17ab0af5f11dda3501fcf55d89593\u0026_ctc=584024ec88b448a4aa4f1836f487255b\u0026_ctn=a4b603bd26214a2c832b0da0b8713054\u0026_cc=0\u0026_pcurl=~%2Fnordic%2Fnordic-blog%2Fb%2Fblog%2Fposts%2Finstrumenting-with-segger-systemview%3FCommentId%3D65e44d50-75c4-4359-87bc-2313f8368a2d',
+			loadMoreTemplate: 'fragment-167_loadMoreTemplate',
+			newRepliesTemplate: 'fragment-167_newRepliesTemplate',
+			replyTemplate: 'fragment-167_replyTemplate',
+			typingIndicatorTemplate: 'fragment-167_typingIndicatorTemplate',
+			replyListTemplate: 'fragment-167_replyListTemplate',
+			replyFormTemplate: 'fragment-167_replyFormTemplate',
+			emptyGuid: '00000000-0000-0000-0000-000000000000',
+			deleteCommentPanelUrl: '#_cptype=panel\u0026_cpcontexttype=Explicit\u0026_cppanelid=5aabcf9a-e27b-49e7-93cf-060498d68763\u0026commentid=00000000-0000-0000-0000-000000000000',
+			loginUrl: '/login?ReturnUrl=%2Fnordic%2Fnordic-blog%2Fb%2Fblog%2Fposts%2Finstrumenting-with-segger-systemview%3FCommentId%3D65e44d50-75c4-4359-87bc-2313f8368a2d',
+			headerTemplate: 'fragment-167_headerTemplate',
+			filterWrapper: '#fragment-167_filter',
+			replyEditor: {
+				appendTo: function(container) {
+					try { if (tinyMCE.get('fragment-167_fragment-167_replyEditor')) { tinyMCE.get('fragment-167_fragment-167_replyEditor').plugins.enhancements.moveTo(container); } else { jQuery('#fragment-167_fragment-167_replyEditor').appendTo(container); } } catch(e) { };
+					try { tinyMCE_TelligentEvolutionOptions.AttachOnKeyDownHandler('fragment-167_fragment-167_replyEditor',function(e) { jQuery.telligent.evolution.messaging.publish('widgets.threadedComments.typing', { container: container }) }); } catch(e) { };
+				},
+				remove: function() {
+					// removing the editor technically just moves it back to a hidden location
+					var wrapper = '#fragment-167_editorWrapperWrapper';
+					try { if (tinyMCE.get('fragment-167_fragment-167_replyEditor')) { tinyMCE.get('fragment-167_fragment-167_replyEditor').plugins.enhancements.moveTo(wrapper); } else { jQuery('#fragment-167_fragment-167_replyEditor').appendTo(wrapper); } } catch(e) { };
+				},
+				val: function(val) {
+					if (typeof(val) !== 'undefined') {
+						tinyMCE_TelligentEvolutionOptions.SetContent(val, tinyMCE.get('fragment-167_fragment-167_replyEditor'));
+					}
+					return (tinyMCE.get('fragment-167_fragment-167_replyEditor').getContent() || '').replace(/(?:^\W*<p[^>]*>(?:&nbsp;)?<\/p>|<p[^>]*>(?:&nbsp;)?<\/p>\W*$)/gi, '')
+				},
+				focus: function() {
+					try { tinyMCE.get('fragment-167_fragment-167_replyEditor').plugins.enhancements.focusAndView(); } catch (e) { }
+				}
+			},
+			text: {
+				more: 'More',
+				peopleWhoVoted: 'People who voted on this reply',
+				noVotes: 'No Votes',
+				successMessage: 'Your comment has been posted.',
+				moderateMessage: 'Thank you, your comment requires moderation so it may take a while to appear.'
+			},
+			statisticsWrapper: '#fragment-167_statisticsWrapper',
+			statisticsTemplate: 'fragment-167_statisticsTemplate',
+			totalComments: 16,
+			presentUsers: 0,
+			storeTempDataCallbackUrl: '/utility/scripted-file.ashx?CommentId=65e44d50-75c4-4359-87bc-2313f8368a2d\u0026_cf=callback-model-store-temp.vm\u0026_fid=167\u0026_ct=page\u0026_cp=post\u0026_ctt=a3b17ab0af5f11dda3501fcf55d89593\u0026_ctc=584024ec88b448a4aa4f1836f487255b\u0026_ctn=a4b603bd26214a2c832b0da0b8713054\u0026_cc=0\u0026_pcurl=~%2Fnordic%2Fnordic-blog%2Fb%2Fblog%2Fposts%2Finstrumenting-with-segger-systemview%3FCommentId%3D65e44d50-75c4-4359-87bc-2313f8368a2d',
+			loginUrl: '/login?ReturnUrl=%2Fnordic%2Fnordic-blog%2Fb%2Fblog%2Fposts%2Finstrumenting-with-segger-systemview%3FCommentId%3D65e44d50-75c4-4359-87bc-2313f8368a2d',
+			tempBody: '',
+			createEditor: {
+				attachOnChange: function() {
+					try { tinyMCE_TelligentEvolutionOptions.AttachOnKeyDownHandler('fragment-167_fragment-167_createEditor',function(e) { jQuery.telligent.evolution.messaging.publish('widgets.comments.typing', { from: 'fragment-167' }) }); } catch(e) { };
+				},
+				val: function(val) {
+					if (typeof(val) !== 'undefined') {
+						tinyMCE_TelligentEvolutionOptions.SetContent(val, tinyMCE.get('fragment-167_fragment-167_createEditor'));
+					}
+					return (tinyMCE.get('fragment-167_fragment-167_createEditor').getContent() || '').replace(/(?:^\W*<p[^>]*>(?:&nbsp;)?<\/p>|<p[^>]*>(?:&nbsp;)?<\/p>\W*$)/gi, '')
+				},
+				focus: function() {
+					try { tinyMCE.get('fragment-167_fragment-167_createEditor').plugins.enhancements.focusAndView(); } catch (e) { }
+				}
+			}
+		});
+	});
+	</script>
+<script type="text/javascript">
+// <![CDATA[
+if (!$.telligent.evolution.contentFragmentContainers) { $.telligent.evolution.contentFragmentContainers = {}; }
+$.telligent.evolution.contentFragmentContainers.page = new ContentFragmentContainerCustomCallback('ctl02_ctl02_page',new Function('mode','parameters','callback','errorCallback','context','authValue','ctl02_ctl02_ctl00._doCallback(mode+\':\'+authValue+\':\'+parameters,callback,context,errorCallback);'),'AuthorizationCookie');
+// ]]>
+</script>	<script type="text/javascript" src="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/ui.js(3).Без названия"></script>
+	<script type="text/javascript">
+		jQuery(function(){
+			jQuery.telligent.evolution.widgets.userHover.register({
+				getUserInformationUrl: '/utility/scripted-file.ashx?CommentId=65e44d50-75c4-4359-87bc-2313f8368a2d\u0026_cf=get-user-information.vm\u0026_fid=99\u0026_ct=footer\u0026_cp=post\u0026_ctt=a3b17ab0af5f11dda3501fcf55d89593\u0026_ctc=584024ec88b448a4aa4f1836f487255b\u0026_ctn=a4b603bd26214a2c832b0da0b8713054\u0026_cc=0\u0026_pcurl=~%2Fnordic%2Fnordic-blog%2Fb%2Fblog%2Fposts%2Finstrumenting-with-segger-systemview%3FCommentId%3D65e44d50-75c4-4359-87bc-2313f8368a2d',
+				getRecentActivityUrl: '/utility/scripted-file.ashx?CommentId=65e44d50-75c4-4359-87bc-2313f8368a2d\u0026_cf=get-recent-activity.vm\u0026_fid=99\u0026_ct=footer\u0026_cp=post\u0026_ctt=a3b17ab0af5f11dda3501fcf55d89593\u0026_ctc=584024ec88b448a4aa4f1836f487255b\u0026_ctn=a4b603bd26214a2c832b0da0b8713054\u0026_cc=0\u0026_pcurl=~%2Fnordic%2Fnordic-blog%2Fb%2Fblog%2Fposts%2Finstrumenting-with-segger-systemview%3FCommentId%3D65e44d50-75c4-4359-87bc-2313f8368a2d'
+			});
+		});
+	</script>
+	<script type="text/html" id="footer-101_tip_template">
+    <style>
+  .tourtip .tourtip-actions a.tourtip-nevershow {
+    color: #bdc3c7;
+    border: 1px solid #bdc3c7;
+    float: right;
+    margin-right: 10px;
+  }
+  .tourtip .tourtip-actions a.tourtip-nevershow:hover {
+    border: 1px solid #5bd2e2;
+    background-color: #30c6da;
+    color: #fff;
+  }
+    
+  .tourtip .tourtip-okthanks {
+	  position: absolute;
+	  right: 10px;
+	  top: 20px;
+	  float: right;
+	  color: #5bd2e2;
+	  opacity: 0.4;
+	  margin: 0 0 5px 5px;
+	  display: inline-block;
+	  width: 14px;
+	  height: 14px;
+	  text-indent: 200%;
+	  white-space: nowrap;
+	  overflow: hidden;
+  }
+ .tourtip-okthanks:before {
+    text-indent: 0;
+    position: absolute;
+    text-align: center;
+    width: 14px;
+    height: 14px;
+    top: 0px;
+    left: 0;
+    display: block;
+    content: "\e814";
+    font-family: Entypo;
+    font-size: 14px;
+    line-height: 14px;
+  }
+  .tourtip-okthanks:hover {
+	  opacity: 1.0;
+  }   
+    </style>
+		<div class="tourtip">
+			<div class="tourtip-message">
+				<%= message %>
+			</div>
+			<ul class="tourtip-actions">
+				<% if(state.index() > 0) { %>
+					<li>
+						<a href="#" class="tourtip-previous">Previous</a>
+					</li>
+				<% } %>
+				<% if(state.index() < (state.count() - 1)) { %>
+					
+          <li>
+						<a href="#" class="tourtip-next">Next</a>
+					</li>
+				<% } %>
+				<% if(state.index() === (state.count() - 1)) { %>
+					<li>
+						<a href="#" class="tourtip-finish">Ok, got it!</a>
+					</li>
+				<% } else { %>
+					<li>
+						<a href="#" class="ui-tip tourtip-skip" title="Continue this tour in 24 hours.">Later</a>
+					</li>
+				<% } %>
+        <li>
+						<a href="#" class="tourtip-nevershow">Never Show Tips</a>
+				</li>
+			</ul>
+      <div class="tourtip-okthanks">x</div>
+		</div>
+	</script>
+	<script type="text/javascript" src="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/ui.js(4).Без названия"></script>
+	<script type="text/javascript">
+	jQuery(function(){
+		jQuery.telligent.evolution.widgets.tourTips.register({
+			tipTemplate: 'footer-101_tip_template',
+			minWidth: 750,
+			suppressDuration: 86400,
+      neverShowCallback: "/utility/scripted-file.ashx?CommentId=65e44d50-75c4-4359-87bc-2313f8368a2d&_cf=never-show.vm&_fid=101&_ct=footer&_cp=post&_ctt=a3b17ab0af5f11dda3501fcf55d89593&_ctc=584024ec88b448a4aa4f1836f487255b&_ctn=a4b603bd26214a2c832b0da0b8713054&_cc=0&_pcurl=~%2Fnordic%2Fnordic-blog%2Fb%2Fblog%2Fposts%2Finstrumenting-with-segger-systemview%3FCommentId%3D65e44d50-75c4-4359-87bc-2313f8368a2d",
+      neverShowSuccess: 'Tour tips were disabled', 
+      neverShowFailure: 'Could not disable tour tips' 
+		});
+	});
+	</script>
+	<script type="text/javascript">
+	//<![CDATA[
+
+        jQuery.telligent.evolution.ui.components.moderate.defaults = {
+    		reportedText: 'Thank you for your report',
+    		flagText: 'Report as abusive',
+    		flaggedText: 'Reported as abusive'
+    	};
+	//]]>
+	</script>
+<script type="text/javascript">
+// <![CDATA[
+if (!$.telligent.evolution.contentFragmentContainers) { $.telligent.evolution.contentFragmentContainers = {}; }
+$.telligent.evolution.contentFragmentContainers.footer = new ContentFragmentContainerCustomCallback('ctl02_ctl03_page',new Function('mode','parameters','callback','errorCallback','context','authValue','ctl02_ctl03_ctl00._doCallback(mode+\':\'+authValue+\':\'+parameters,callback,context,errorCallback);'),'AuthorizationCookie');
+// ]]>
+</script><script type="text/javascript">
+// <![CDATA[
+window.ctl02_ctl01_ctl00 = new Telligent_CallbackManager('ctl02_ctl01_ctl00','ctl02$ctl01$ctl00','ctl01');
+// ]]>
+</script><script type="text/javascript">
+// <![CDATA[
+window.ctl02_ctl02_ctl00 = new Telligent_CallbackManager('ctl02_ctl02_ctl00','ctl02$ctl02$ctl00','ctl01');
+// ]]>
+</script><script type="text/javascript">
+// <![CDATA[
+window.ctl02_ctl03_ctl00 = new Telligent_CallbackManager('ctl02_ctl03_ctl00','ctl02$ctl03$ctl00','ctl01');
+// ]]>
+</script></form>
+<!--
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+xmlns:dc="http://purl.org/dc/elements/1.1/"
+xmlns:trackback="http://madskills.com/public/xml/rss/module/trackback/">
+<rdf:Description
+rdf:about="https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/posts/instrumenting-with-segger-systemview"
+dc:identifier="https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/posts/instrumenting-with-segger-systemview"
+dc:title="Instrumenting with Segger SystemView"
+trackback:ping="https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/trackback?WeblogPostId=931" />
+</rdf:RDF>
+-->
+<!-- Start of Async HubSpot Analytics Code -->
+<script type="text/javascript">
+(function(d,s,i,r) {
+if (d.getElementById(i)){return;}
+var n=d.createElement(s),e=d.getElementsByTagName(s)[0];
+n.id=i;n.src='//js.hs-analytics.net/analytics/'+(Math.ceil(new Date()/r)*r)+'/1961165.js';
+e.parentNode.insertBefore(n, e);
+})(document,"script","hs-analytics",300000);
+</script>
+<!-- End of Async HubSpot Analytics Code -->
+
+<div style="position: absolute; display: none; z-index: 7000;"></div>
+<script type="text/javascript" id="">!function(b,e,f,g,a,c,d){b.fbq||(a=b.fbq=function(){a.callMethod?a.callMethod.apply(a,arguments):a.queue.push(arguments)},b._fbq||(b._fbq=a),a.push=a,a.loaded=!0,a.version="2.0",a.queue=[],c=e.createElement(f),c.async=!0,c.src=g,d=e.getElementsByTagName(f)[0],d.parentNode.insertBefore(c,d))}(window,document,"script","https://connect.facebook.net/en_US/fbevents.js");fbq("init","516903161852586");fbq("track","PageView");</script>
+<noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=516903161852586&amp;ev=PageView&amp;noscript=1"></noscript>
+<script type="text/javascript" id="">var _hsq=_hsq||[];$(document).ready(function(){_hsq&&_hsq.push(["addPrivacyConsentListener",function(a){a.allowed&&window.dataLayer.push({event:"hsConsented"})}])});</script>
+<div class="recommended-content-slider" style="width: 250px; min-height: 75px; max-height: 490.7px; position: fixed; bottom: 25px; right: 0px; transition: all 0s ease 0s; opacity: 1e-05; transform: translate3d(-25px, 0px, 0px); display: none;">
+			<div class="recommended-content-slider-content">
+				<a href="https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/posts/instrumenting-with-segger-systemview?CommentId=65e44d50-75c4-4359-87bc-2313f8368a2d#" data-messagename="telligent.evolution.widgets.more.slider.close" class="close">Close</a>
+				
+					<h2>Related</h2>
+					<ul class="content-list slider"><li class="content-item" data-href="https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/posts/profiling-the-softdevice-and-freertos-with-segger-">
+			<a href="https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/posts/profiling-the-softdevice-and-freertos-with-segger-" class="internal-link view-full-post navigable">
+				<div class="content">Profiling the Softdevice and FreeRTOS with Segger SystemView</div>
+			</a>
+			<div class="author">
+				<div class="avatar">
+											<img src="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/anonymous.gif-35x35x2.png" border="0px" alt="Tim">
+									</div>
+				<div class="meta">
+					<a href="https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/posts/profiling-the-softdevice-and-freertos-with-segger-" class="internal-link view-post navigable">
+						 In a previous blog post , RK has shown us how to use Segger SystemView to monitor a bare-metal application as well as the Softdevice. Based on his work, we will see how to go further and add FreeRTOS...
+					</a>
+				</div>
+			</div>
+		</li><li class="content-item" data-href="https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/posts/segger-embedded-studio-blog-post-rev2-deprecated">
+			<a href="https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/posts/segger-embedded-studio-blog-post-rev2-deprecated" class="internal-link view-full-post navigable">
+				<div class="content">Segger Embedded Studio blog post rev2 DEPRECATED</div>
+			</a>
+			<div class="author">
+				<div class="avatar">
+											<img src="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/4U30GC3Q94LZ.jpg-35x35x2.jpg" border="0px" alt="Michael Dietz">
+									</div>
+				<div class="meta">
+					<a href="https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/posts/segger-embedded-studio-blog-post-rev2-deprecated" class="internal-link view-post navigable">
+						 Depreceted 
+ see new blog post for new version of embedded studio here: 
+ https://devzone.nordicsemi.com/blogs/1032/segger-embedded-studio-a-cross-platform-ide-w-no-c/ 
+ #Introduction
+This post is...
+					</a>
+				</div>
+			</div>
+		</li><li class="content-item" data-href="https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/posts/segger-embedded-studio-a-cross-platform-ide">
+			<a href="https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/posts/segger-embedded-studio-a-cross-platform-ide" class="internal-link view-full-post navigable">
+				<div class="content">Segger Embedded Studio - A Cross Platform IDE</div>
+			</a>
+			<div class="author">
+				<div class="avatar">
+											<img src="./Instrumenting with Segger SystemView - Nordic Blog - Nordic Blog - Nordic DevZone_files/4U6HVYWENFZM.png-35x35x2.png" border="0px" alt="Hung Bui">
+									</div>
+				<div class="meta">
+					<a href="https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/posts/segger-embedded-studio-a-cross-platform-ide" class="internal-link view-post navigable">
+						 Download and Setup 
+ 
+ Download Embedded Studio &gt;= v3.10e 
+ Download and install the J-Link Software and Documentation Pack &gt;= v6.10g 
+ Download and unzip Nordic's nRF5 SDK &gt;= v12.0.1 
+ 
+ Note:...
+					</a>
+				</div>
+			</div>
+		</li></ul>
+				
+			</div>
+		</div><div id="SL_balloon_obj" alt="0" style="display: block;"><div id="SL_button" class="SL_ImTranslatorLogo" style="background: url(&quot;chrome-extension://noaijdpnepcgjemiklgfkcfbkokogabh/content/img/util/imtranslator-s.png&quot;); display: none; opacity: 0; left: 548px; top: 4266px; transition: visibility 1s ease 0s, opacity 1s linear 0s;"></div><div id="SL_shadow_translation_result2" style="display: none;"></div><div id="SL_shadow_translator" style="left: -10000px; top: -10000px; display: none;"><div id="SL_planshet"><div id="SL_arrow_up" style="background: url(&quot;chrome-extension://noaijdpnepcgjemiklgfkcfbkokogabh/content/img/util/up.png&quot;);"></div><div id="SL_Bproviders"></div><div id="SL_alert_bbl" style="display: none;"><div id="SLHKclose" style="background: url(&quot;chrome-extension://noaijdpnepcgjemiklgfkcfbkokogabh/content/img/util/delete.png&quot;);"></div><div id="SL_alert_cont"></div></div><div id="SL_TB"><table id="SL_tables" cellspacing="1"><tr><td class="SL_td" width="10%" align="right"><input id="SL_locer" type="checkbox" title="Зафиксировать язык"></td><td class="SL_td" width="20%" align="left"><select id="SL_lng_from" class="SL_lngs"><option value="auto">Определить язык</option><option value="az">Азербайджанский</option><option value="sq">Албанский</option><option value="am">Амхарский</option><option value="en">Английский</option><option value="ar">Арабский</option><option value="hy">Армянский</option><option value="af">Африкаанс</option><option value="eu">Баскский</option><option value="be">Белорусский</option><option value="bn">Бенгальский</option><option value="my">Бирманский</option><option value="bg">Болгарский</option><option value="bs">Боснийский</option><option value="cy">Валлийский</option><option value="hu">Венгерский</option><option value="vi">Вьетнамский</option><option value="haw">Гавайский</option><option value="ht">Гаитянский</option><option value="gl">Галисийский</option><option value="nl">Голландский</option><option value="el">Греческий</option><option value="ka">Грузинский</option><option value="gu">Гуджарати</option><option value="da">Датский</option><option value="zu">Зулу</option><option value="iw">Иврит</option><option value="ig">Игбо</option><option value="yi">Идиш</option><option value="id">Индонезийский</option><option value="ga">Ирландский</option><option value="is">Исландский</option><option value="es">Испанский</option><option value="it">Итальянский</option><option value="yo">Йоруба</option><option value="kk">Казахский</option><option value="kn">Каннада</option><option value="ca">Каталанский</option><option value="ky">Киргизский</option><option value="zh-TW">Китайский Трад</option><option value="zh-CN">Китайский Упр</option><option value="ko">Корейский</option><option value="co">Корсиканский</option><option value="ku">Курманджи</option><option value="km">Кхмерский</option><option value="xh">Кхоса</option><option value="lo">Лаосский</option><option value="la">Латинский</option><option value="lv">Латышский</option><option value="lt">Литовский</option><option value="lb">Люксембургский</option><option value="mk">Македонский</option><option value="mg">Малагасийский</option><option value="ms">Малайский</option><option value="ml">Малаялам</option><option value="mt">Мальтийский</option><option value="mi">Маори</option><option value="mr">Маратхи</option><option value="mn">Монгольский</option><option value="de">Немецкий</option><option value="ne">Непальский</option><option value="no">Норвежский</option><option value="pa">Панджаби</option><option value="fa">Персидский</option><option value="pl">Польский</option><option value="pt">Португальский</option><option value="ps">Пушту</option><option value="ro">Румынский</option><option value="ru">Русский</option><option value="sm">Самоанский</option><option value="ceb">Себуанский</option><option value="sr">Сербский</option><option value="st">Сесото</option><option value="si">Сингальский</option><option value="sd">Синдхи</option><option value="sk">Словацкий</option><option value="sl">Словенский</option><option value="so">Сомалийский</option><option value="sw">Суахили</option><option value="su">Сунданский</option><option value="tg">Таджикский</option><option value="th">Тайский</option><option value="ta">Тамильский</option><option value="te">Телугу</option><option value="tr">Турецкий</option><option value="uz">Узбекский</option><option value="uk">Украинский</option><option value="ur">Урду</option><option value="tl">Филиппинский</option><option value="fi">Финский</option><option value="fr">Французский</option><option value="fy">Фризский</option><option value="ha">Хауса</option><option value="hi">Хинди</option><option value="hmn">Хмонг</option><option value="hr">Хорватский</option><option value="ny">Чева</option><option value="cs">Чешский</option><option value="sv">Шведский</option><option value="sn">Шона</option><option value="gd">Шотландский (гэльский)</option><option value="eo">Эсперанто</option><option value="et">Эстонский</option><option value="jw">Яванский</option><option value="ja">Японский</option></select></td><td class="SL_td" width="3" align="center"><div id="SL_switch_b" title="Переключить направление" style="background: url(&quot;chrome-extension://noaijdpnepcgjemiklgfkcfbkokogabh/content/img/util/switchb.png&quot;);"></div></td><td class="SL_td" width="20%" align="left"><select id="SL_lng_to" class="SL_lngs"><option value="az">Азербайджанский</option><option value="sq">Албанский</option><option value="am">Амхарский</option><option value="en">Английский</option><option value="ar">Арабский</option><option value="hy">Армянский</option><option value="af">Африкаанс</option><option value="eu">Баскский</option><option value="be">Белорусский</option><option value="bn">Бенгальский</option><option value="my">Бирманский</option><option value="bg">Болгарский</option><option value="bs">Боснийский</option><option value="cy">Валлийский</option><option value="hu">Венгерский</option><option value="vi">Вьетнамский</option><option value="haw">Гавайский</option><option value="ht">Гаитянский</option><option value="gl">Галисийский</option><option value="nl">Голландский</option><option value="el">Греческий</option><option value="ka">Грузинский</option><option value="gu">Гуджарати</option><option value="da">Датский</option><option value="zu">Зулу</option><option value="iw">Иврит</option><option value="ig">Игбо</option><option value="yi">Идиш</option><option value="id">Индонезийский</option><option value="ga">Ирландский</option><option value="is">Исландский</option><option value="es">Испанский</option><option value="it">Итальянский</option><option value="yo">Йоруба</option><option value="kk">Казахский</option><option value="kn">Каннада</option><option value="ca">Каталанский</option><option value="ky">Киргизский</option><option value="zh-TW">Китайский Трад</option><option value="zh-CN">Китайский Упр</option><option value="ko">Корейский</option><option value="co">Корсиканский</option><option value="ku">Курманджи</option><option value="km">Кхмерский</option><option value="xh">Кхоса</option><option value="lo">Лаосский</option><option value="la">Латинский</option><option value="lv">Латышский</option><option value="lt">Литовский</option><option value="lb">Люксембургский</option><option value="mk">Македонский</option><option value="mg">Малагасийский</option><option value="ms">Малайский</option><option value="ml">Малаялам</option><option value="mt">Мальтийский</option><option value="mi">Маори</option><option value="mr">Маратхи</option><option value="mn">Монгольский</option><option value="de">Немецкий</option><option value="ne">Непальский</option><option value="no">Норвежский</option><option value="pa">Панджаби</option><option value="fa">Персидский</option><option value="pl">Польский</option><option value="pt">Португальский</option><option value="ps">Пушту</option><option value="ro">Румынский</option><option selected="selected" value="ru">Русский</option><option value="sm">Самоанский</option><option value="ceb">Себуанский</option><option value="sr">Сербский</option><option value="st">Сесото</option><option value="si">Сингальский</option><option value="sd">Синдхи</option><option value="sk">Словацкий</option><option value="sl">Словенский</option><option value="so">Сомалийский</option><option value="sw">Суахили</option><option value="su">Сунданский</option><option value="tg">Таджикский</option><option value="th">Тайский</option><option value="ta">Тамильский</option><option value="te">Телугу</option><option value="tr">Турецкий</option><option value="uz">Узбекский</option><option value="uk">Украинский</option><option value="ur">Урду</option><option value="tl">Филиппинский</option><option value="fi">Финский</option><option value="fr">Французский</option><option value="fy">Фризский</option><option value="ha">Хауса</option><option value="hi">Хинди</option><option value="hmn">Хмонг</option><option value="hr">Хорватский</option><option value="ny">Чева</option><option value="cs">Чешский</option><option value="sv">Шведский</option><option value="sn">Шона</option><option value="gd">Шотландский (гэльский)</option><option value="eo">Эсперанто</option><option value="et">Эстонский</option><option value="jw">Яванский</option><option value="ja">Японский</option></select></td><td class="SL_td" width="5%" align="center"> </td><td class="SL_td" width="8%" align="center"><div id="SL_TTS_voice" title="undefined" style="background: url(&quot;chrome-extension://noaijdpnepcgjemiklgfkcfbkokogabh/content/img/util/ttsvoice.png&quot;);"></div></td><td class="SL_td" width="8%" align="center"><div id="SL_copy" title="Скопировать" class="SL_copy" style="background: url(&quot;chrome-extension://noaijdpnepcgjemiklgfkcfbkokogabh/content/img/util/copy.png&quot;);"><div id="SL_copy_tip"></div></div></td><td class="SL_td" width="8%" align="center"><div id="SL_bbl_font_patch"></div><div id="SL_bbl_font" title="Размер шрифта" class="SL_bbl_font" style="background: url(&quot;chrome-extension://noaijdpnepcgjemiklgfkcfbkokogabh/content/img/util/font.png&quot;);"></div></td><td class="SL_td" width="8%" align="center"><div id="SL_bbl_help" title="Справка" style="background: url(&quot;chrome-extension://noaijdpnepcgjemiklgfkcfbkokogabh/content/img/util/bhelp.png&quot;);"></div></td><td class="SL_td" width="15%" align="right"><div id="SL_pin" class="SL_pin_off" title="Закрепить всплывающее окно" style="background: url(&quot;chrome-extension://noaijdpnepcgjemiklgfkcfbkokogabh/content/img/util/pin-on.png&quot;);"></div></td></tr></table></div></div><div id="SL_shadow_translation_result" style="visibility: visible;"></div><div id="SL_loading" class="SL_loading" style="background: url(&quot;chrome-extension://noaijdpnepcgjemiklgfkcfbkokogabh/content/img/util/loading.gif&quot;);"></div><div id="SL_player2" style="display: none;"></div><div id="SL_alert100" style="display: none;">Звуковая функция ограничена 200 символами</div><div id="SL_Balloon_options" style="background: url(&quot;chrome-extension://noaijdpnepcgjemiklgfkcfbkokogabh/content/img/util/bg3.png&quot;) rgb(255, 255, 255);"><div id="SL_arrow_down" style="background: url(&quot;chrome-extension://noaijdpnepcgjemiklgfkcfbkokogabh/content/img/util/down.png&quot;);"></div><table id="SL_tbl_opt" width="100%"><tr><td class="SL_td" width="5%" align="center"><input id="SL_BBL_locer" type="checkbox" checked="1" title="Показывать кнопку ImTranslator Bubble 3 секунд"></td><td class="SL_td" width="5%" align="left"><div id="SL_BBL_IMG" title="Показывать кнопку ImTranslator Bubble 3 секунд" style="background: url(&quot;chrome-extension://noaijdpnepcgjemiklgfkcfbkokogabh/content/img/util/bbl-logo.png&quot;);"></div></td><td class="SL_td" width="70%" align="center"><a href="chrome-extension://noaijdpnepcgjemiklgfkcfbkokogabh/content/html/options/options.html?bbl" target="_blank" class="SL_options" title="Показать настройки">Настройки</a> : <a href="chrome-extension://noaijdpnepcgjemiklgfkcfbkokogabh/content/html/options/options.html?hist" target="_blank" class="SL_options" title="История переводов">История</a> : <a href="chrome-extension://noaijdpnepcgjemiklgfkcfbkokogabh/content/html/options/options.html?feed" target="_blank" class="SL_options" title="Обратная связь">Обратная связь</a> : <a href="https://imtranslator.net/extensions/?tp=chr-ImTranslator&amp;a=0" target="_blank" class="SL_options" title="Сделать пожертвование">Donate</a></td><td class="SL_td" width="15%" align="right"><span id="SL_Balloon_Close" class="SL_options" title="Закрыть">Закрыть</span></td></tr></table></div></div></div><script type="text/javascript" src="chrome-extension://aalppolilappfakpmdfdkpppdnhpgifn/installHook.js"></script></body></html>

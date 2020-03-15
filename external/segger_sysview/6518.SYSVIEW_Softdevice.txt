@@ -1,0 +1,150 @@
+# SOC Events
+
+NamedType NRF_SOC_EVT 0=HFClkStarted
+NamedType NRF_SOC_EVT 1=PowerFailureWarning
+NamedType NRF_SOC_EVT 2=FlashOpSuccess 3=FlashOpFailure
+NamedType NRF_SOC_EVT 4=RadioBlocked 5=RadioCancelled 6=RadioCBInvalidReturn 7=RadioSessionIdle 8=RadioSessionClosed
+NamedType NRF_SOC_EVT 1022=NoMoreEvents 1023=Unknown
+
+# BLE Events
+NamedType NRF_BLE_EVT 0=TXComplete 1=UserMemRequest 2=UserMemRelease
+NamedType NRF_BLE_EVT 16=GapConnected 17=GapDisconnected 18=GapConnParamUpdate 19=GapSecParamsRequest 20=GapSecInfoRequest
+NamedType NRF_BLE_EVT 21=GapPasskeyDisplay 22=GapKeyPressed 23=GapAuthKeyRequest 24=GapLESCDHKeyRequest 25=GapAuthStatus
+NamedType NRF_BLE_EVT 26=GapConnSecUpdate 27=GapTimeout 28=GapRSSIChanged 29=GapAdvReport 30=GapSecRequest
+NamedType NRF_BLE_EVT 31=GapConnParamUpdateRequest 32=GapScanReqReport
+NamedType NRF_BLE_EVT 48=GattcPrimSrvcDiscRsp 49=GattcRelDiscRsp 50=GattcCharDiscRsp 51=GattcDescDiscRsp
+NamedType NRF_BLE_EVT 52=GattcAttrInfoDiscRsp 53=GattcCharValByUUIDReadRsp 54=GattcReadRsp 55=GattcCharValsReadRsp
+NamedType NRF_BLE_EVT 56=GattcWriteRsp 57=GattcHvx 58=GattcTimeout
+NamedType NRF_BLE_EVT 64=GattsWrite 65=GattsRWAuthorizeRequest 66=GattsSysAttrMissing 67=GattsHvc
+NamedType NRF_BLE_EVT 68=GattsSCConfirm 69=GattsTimeout
+NamedType NRF_BLE_EVT 80=L2capRx
+NamedType NRF_BLE_EVT 1022=NoMoreEvents 1023=Unknown
+
+# Fixed Strings
+NamedType FIXED_STRING 0=conn_handle 1=num 2=type 3=addr 4=len 
+NamedType FIXED_STRING 5=min_conn 6=max_conn 7=slave_latency 8=reason
+NamedType FIXED_STRING 9=status 10=mode+lvl 11=source 12=RSSI 13=handle
+NamedType FIXED_STRING 14=offset 15=cid
+
+
+# API Functions 
+33     svcall                               ret=%p svc_num=%p
+48     svcall_sdm							ret=%p softdevice_enable()
+49     svcall_scm							ret=%p softdevice_disable)
+50     svcall_scm                           ret=%p softdevice_is_enabled() -> enabled=%d 
+51     svcall_scm							ret=%p softdevice_vector_table_base_set( base=%p )
+64     svcall_soc							ret=%p ppi_channel_enable_get() -> enabled=%p
+65     svcall_soc							ret=%p ppi_channel_enable_set( set=%p )
+66     svcall_soc							ret=%p ppi_channel_enable_clr( clr=%p )
+67     svcall_soc							ret=%p ppi_channel_assign( ch=%u evt=%p tsk=%p )
+68     svcall_soc							ret=%p ppi_group_task_enable( grp=%u )
+69     svcall_soc							ret=%p ppi_group_task_disable( grp=%u )
+70     svcall_soc							ret=%p ppi_group_assign( grp=%u mask=%p )
+71     svcall_soc							ret=%p ppi_group_get( grp=%u ) -> mask=%p
+72     svcall_soc							ret=%p flash_page_erase( page=%u )
+73     svcall_soc							ret=%p flash_page_write( dst=%p src=%p len=%p )
+74     svcall_soc							ret=%p flash_page_protect( cfg0=%p cfg1=%p cfg2=%p cfg3=%p )
+75     svcall_soc                           ret=%p mutex_new( mutex=%p )
+76     svcall_soc							ret=%p mutex_acquire( mutex=%p )
+77     svcall_soc							ret=%p mutex_release( mutex=%p )
+78     svcall_soc							ret=%p rand_app_pool_capacity_get() -> capacity=%u
+79     svcall_soc							ret=%p rand_app_bytes_available_get() -> bytes=%u
+80     svcall_soc							ret=%p rand_app_vector_get( len=%u )
+81     svcall_soc							ret=%p power_mode_set( mode=%u )
+82     power_system_off						ignore=%p 
+83     svcall_soc							ret=%p power_reset_reason_get() -> reason=%p
+84     svcall_soc							ret=%p power_reset_reason_clear( bits=%p )
+85     svcall_soc							ret=%p power_pof_enable( enable=%u )
+86     svcall_soc							ret=%p power_pof_threshold_set( threshold=%u )
+87     svcall_soc							ret=%p power_ramon_set( set_bits=%p )
+88     svcall_soc							ret=%p power_ramon_clr( clr_bits=%p )
+89     svcall_soc							ret=%p power_ramon_get() -> bits=%p 
+90     svcall_soc							ret=%p power_gpregret_set( set_bits=%p )
+91     svcall_soc							ret=%p power_gpregret_clr( clr_bits=%p )
+92     svcall_soc							ret=%p power_gpregret_get() -> bits=%p
+93     svcall_soc							ret=%p power_dcdc_mode_set( mode=%u )
+94     app_event_wait                       code_addr=%p
+95     svcall_soc							ret=%p clock_hfclk_request()
+96     svcall_soc							ret=%p clock_hfclk_release()
+97     svcall_soc							ret=%p clock_hfclk_is_running() -> is_running=%u 
+98     svcall_soc							ret=%p radio_notification_cfg_set( type=%u distance=%u )
+99     svcall_soc							ret=%p ecb_block_encrypt()
+100    svcall_soc							ret=%p ecb_blocks_encrypt( num_blocks=%u )
+101    svcall_soc							ret=%p radio_session_open( callback=%p )
+102    svcall_soc							ret=%p radio_session_close()
+103    svcall_soc							ret=%p radio_request( request=%u )
+104    evt_get                              ret=%p [%NRF_SOC_EVT ]
+105    svcall_soc                           ret=%p temp_get() -> tempX4=%d
+112    svcall_ble                           ret=%p ble_enable() -> ram_base=%p
+113    ble_evt_get                          ret=%p [Unknown] event=0x%x
+114    svcall_ble							ret=%p ble_tx_pkt_count_get( conn_h=0x%x ) -> count=%u
+115    svcall_ble							ret=%p ble_uuid_vs_add( uuid=%s ) -> handle=0x%x
+116    svcall_ble							ret=%p ble_uuid_decode() -> uuid={%u:%p}
+117    svcall_ble							ret=%p ble_uuid_encode( uuid={%u:%p} ) -> len=%u 
+118    svcall_ble							ret=%p ble_version_get()
+119    svcall_ble							ret=%p ble_user_mem_reply( conn_h=0x%x ptr=%p )
+120    svcall_ble							ret=%p ble_opt_set( opt=%u )
+121    svcall_ble							ret=%p ble_opt_get() opt=%u
+128    svcall_gap							ret=%p ble_gap_address_set( mode=%u )
+129    svcall_gap							ret=%p ble_gap_address_get()
+130    svcall_gap							ret=%p ble_gap_adv_data_set() -> adlen=%u srlen=%u
+131    svcall_gap							ret=%p ble_gap_adv_start()
+132    svcall_gap							ret=%p ble_gap_adv_stop()
+133    svcall_gap							ret=%p ble_gap_conn_param_update( conn_h=0x%x )
+134    svcall_gap							ret=%p ble_gap_disconnect( conn_h=0x%x reason=%u )
+135    svcall_gap							ret=%p ble_gap_tx_power_set( power=%d )
+136    svcall_gap							ret=%p ble_gap_appearance_set( value=%p )
+137    svcall_gap							ret=%p ble_gap_appearance_get() -> value=%p
+138    svcall_gap							ret=%p ble_gap_ppcp_set()
+139    svcall_gap							ret=%p ble_gap_ppcp_get()
+140    svcall_gap							ret=%p ble_gap_device_name_set( len=%u )
+141    svcall_gap							ret=%p ble_gap_device_name_get() -> len=%u
+142    svcall_gap							ret=%p ble_gap_authenticate( conn_h=0x%x )
+143    svcall_gap							ret=%p ble_gap_sec_params_reply( conn_h=0x%x status=%u )
+144    svcall_gap							ret=%p ble_gap_auth_key_reply( conn_h=0x%x type=%u )
+145    svcall_gap							ret=%p ble_gap_lesc_dhkey_reply( conn_h=0x%x )
+146    svcall_gap							ret=%p ble_gap_keypress_notify( conn_h=0x%x kp_not=%u )
+147    svcall_gap							ret=%p ble_gap_lesc_oob_data_get( conn_h=0x%x )
+148    svcall_gap							ret=%p ble_gap_lesc_oob_data_set( conn_h=0x%x )
+149    svcall_gap							ret=%p ble_gap_encrypt( conn_h=0x%x )
+150    svcall_gap							ret=%p ble_gap_sec_info_reply( conn_h=0x%x )
+151    svcall_gap							ret=%p ble_gap_conn_sec_get( conn_h=0x%x )
+152    svcall_gap							ret=%p ble_gap_rssi_start( conn_h=0x%x dbm_thresh=%u skip=%u )
+153    svcall_gap							ret=%p ble_gap_rssi_stop( conn_h=0x%x )
+154    svcall_gap							ret=%p ble_gap_scan_start()
+155    svcall_gap							ret=%p ble_gap_scan_stop()
+156    svcall_gap							ret=%p ble_gap_connect()
+157    svcall_gap							ret=%p ble_gap_connect_cancel()
+158    svcall_gap							ret=%p ble_gap_rssi_get( conn_h=0x%x ) -> rssi=%d
+160    svcall_gattc							ret=%p ble_gattc_primary_services_discover( conn_h=0x%x start_h=0x%x )
+161    svcall_gattc							ret=%p ble_gattc_relationships_discover( conn_h=0x%x )	
+162    svcall_gattc							ret=%p ble_gattc_characteristics_discover( conn_h=0x%x
+163    svcall_gattc							ret=%p ble_gattc_descriptors_discover( conn_h=0x%x )
+164    svcall_gattc							ret=%p ble_gattc_attr_info_discover( conn_h=0x%x )
+165    svcall_gattc							ret=%p ble_gattc_char_value_by_uuid_read( conn_h=0x%x uuid={%u:%p} )
+166    svcall_gattc							ret=%p ble_gattc_read( conn_h=0x%x handle=0x%x offset=%u )
+167    svcall_gattc							ret=%p ble_gattc_char_values_read( conn_h=0x%x count=%u )		
+168    svcall_gattc							ret=%p ble_gattc_write( conn_h=0x%x )
+169    svcall_gattc							ret=%p ble_gattc_hv_confirm( conn_h=0x%x handle=0x%x )
+176    svcall_gatts							ret=%p ble_gatts_service_add( type=%u uuid={%u:%p} ) -> handle=0x%x
+177    svcall_gatts							ret=%p ble_gatts_include_add( svc_h=0x%x inc_svc_h=0x%x ) -> handle=0x%x
+178    svcall_gatts							ret=%p ble_gatts_characteristic_add( svc_h=0x%x uuid={%u:%p} ) -> value_handle=0x%x
+179    svcall_gatts							ret=%p ble_gatts_descriptor_add( char_h=0x%x uuid={%u:%p} ) -> desc_h=0x%x
+180    svcall_gatts							ret=%p ble_gatts_value_set( conn_h=0x%x handle=0x%x )
+181    svcall_gatts							ret=%p ble_gatts_value_get( conn_h=0x%x handle=0x%x )
+182    svcall_gatts							ret=%p ble_gatts_hvx( conn_h=0x%x, handle=0x%x )
+183    svcall_gatts							ret=%p ble_gatts_service_changed( conn_h=0x%x start_h=0x%x end_h=0x%x )
+184    svcall_gatts							ret=%p ble_gatts_rw_authorize_reply( conn_h=0x%x )
+185    svcall_gatts							ret=%p ble_gatts_sys_attr_set( conn_h=0x%x )
+186    svcall_gatts							ret=%p ble_gatts_sys_attr_get( conn_h=0x%x )
+187    svcall_gatts							ret=%p ble_gatts_initial_user_handle_get() -> init_h=0x%x
+188    svcall_gatts							ret=%p ble_gatts_attr_get( handle=0x%x )
+192    svcall_l2cap							ret=%p ble_l2cap_cid_register( cid=%u )
+193    svcall_l2cap							ret=%p ble_l2cap_cid_unregister( cid=%u )
+194    svcall_l2cap							ret=%p ble_l2cap_tx( conn_h=0x%x )
+
+500    ble_evt_get                          ret=%p [%NRF_BLE_EVT ]
+501	   ble_evt_get							ret=%p [%NRF_BLE_EVT ] %FIXED_STRING =0x%x
+502	   ble_evt_get							ret=%p [%NRF_BLE_EVT ] %FIXED_STRING =0x%x %FIXED_STRING =0x%x
+503    ble_evt_get							ret=%p [%NRF_BLE_EVT ] %FIXED_STRING =0x%x %FIXED_STRING =0x%x %FIXED_STRING =0x%x
+504    ble_evt_get                          ret=%p [%NRF_BLE_EVT ] %FIXED_STRING =0x%x %FIXED_STRING =0x%x %FIXED_STRING =0x%x %FIXED_STRING =0x%x 
