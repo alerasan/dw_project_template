@@ -7,6 +7,7 @@ Simply add (or ever symlink) your projects to examples folder and decawave drive
 You main.c may contain code like this after initialization, but before scheduling:
 
 `
+
     /* USER CODE BEGIN RTOS_MUTEX */
 
     sysview_all_irq_log(true);
@@ -30,6 +31,7 @@ You main.c may contain code like this after initialization, but before schedulin
     SEGGER_SYSVIEW_Print("egor");
 
     /* USER CODE BEGIN RTOS_SEMAPHORES */
+
 `
 
 Regards
