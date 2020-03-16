@@ -4,7 +4,9 @@
 
 Simply add (or ever symlink) your projects to examples folder and decawave driver folder to root folder
 
-You main.c may contain code like this after initialization, but before scheduling:
+You main.c may contain code like this.
+
+After initialization, but before scheduling:
 
 `
 
